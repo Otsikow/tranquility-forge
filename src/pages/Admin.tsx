@@ -171,21 +171,24 @@ export default function Admin() {
                 <CardDescription>Manage user accounts and permissions</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="flex items-center justify-between p-4 border border-border rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
+                    <div 
+                      key={i} 
+                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="h-10 w-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
                           <Users className="h-5 w-5 text-primary" />
                         </div>
-                        <div>
-                          <p className="font-medium text-foreground">User {i}</p>
-                          <p className="text-sm text-muted-foreground">user{i}@example.com</p>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-foreground truncate">User {i}</p>
+                          <p className="text-sm text-muted-foreground truncate">user{i}@example.com</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline">Active</Badge>
-                        <Button variant="outline" size="sm">Manage</Button>
+                      <div className="flex items-center gap-2 sm:shrink-0 self-start sm:self-center">
+                        <Badge variant="outline" className="shrink-0">Active</Badge>
+                        <Button variant="outline" size="sm" className="shrink-0">Manage</Button>
                       </div>
                     </div>
                   ))}
