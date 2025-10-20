@@ -14,6 +14,7 @@ import Moods from "./pages/Moods";
 import Journal from "./pages/Journal";
 import Breathe from "./pages/Breathe";
 import Profile from "./pages/Profile";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/journal" element={<Journal />} />
           <Route path="/breathe" element={<Breathe />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

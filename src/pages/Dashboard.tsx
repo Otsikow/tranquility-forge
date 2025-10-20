@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BottomNav } from "@/components/BottomNav";
 import { MoodChart } from "@/components/MoodChart";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Leaf, BookOpen, Wind, MessageCircle, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -38,17 +39,21 @@ export default function Dashboard() {
       <div className="bg-card border-b border-border px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Leaf className="h-8 w-8 text-primary" />
-          <h1 className="text-lg font-semibold text-card-foreground">
+          <h1 className="text-lg font-semibold text-foreground">
             Good morning, {userName}
           </h1>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate("/profile")}
-        >
-          <Settings className="h-5 w-5" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate("/profile")}
+            className="text-foreground hover:text-foreground"
+          >
+            <Settings className="h-5 w-5" />
+          </Button>
+        </div>
       </div>
 
       <div className="px-6 py-6 space-y-6 animate-fade-up">

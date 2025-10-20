@@ -20,12 +20,12 @@ export const AppBar = ({ title, showBack = true, showSettings = false, onSetting
             variant="ghost"
             size="icon"
             onClick={() => navigate(-1)}
-            className="h-9 w-9"
+            className="h-9 w-9 text-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
         )}
-        <h1 className="text-lg font-semibold text-card-foreground">{title}</h1>
+        <h1 className="text-lg font-semibold text-foreground">{title}</h1>
       </div>
       
       {showSettings && (
@@ -33,7 +33,7 @@ export const AppBar = ({ title, showBack = true, showSettings = false, onSetting
           variant="ghost"
           size="icon"
           onClick={onSettingsClick}
-          className="h-9 w-9"
+          className="h-9 w-9 text-foreground hover:text-foreground"
         >
           <Settings className="h-5 w-5" />
         </Button>
