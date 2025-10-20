@@ -8,6 +8,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { usePWA } from "@/hooks/usePWA";
+import { lazy, Suspense } from "react";
+
+// Eager load critical routes
 import Index from "./pages/Index";
 import Welcome from "./pages/Welcome";
 import Login from "./pages/auth/Login";
@@ -15,24 +18,26 @@ import Register from "./pages/auth/Register";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import Dashboard from "./pages/Dashboard";
-import Chat from "./pages/Chat";
-import Moods from "./pages/Moods";
-import Journal from "./pages/Journal";
-import JournalNew from "./pages/JournalNew";
-import JournalEdit from "./pages/JournalEdit";
-import Meditations from "./pages/Meditations";
-import MeditationPlayer from "./pages/MeditationPlayer";
-import Affirmations from "./pages/Affirmations";
-import Breathe from "./pages/Breathe";
-import Profile from "./pages/Profile";
-import Settings from "./pages/Settings";
-import ProfileSecurity from "./pages/settings/ProfileSecurity";
-import Notifications from "./pages/settings/Notifications";
-import Help from "./pages/settings/Help";
-import About from "./pages/settings/About";
-import Legal from "./pages/settings/Legal";
-import Admin from "./pages/Admin";
-import NotFound from "./pages/NotFound";
+
+// Lazy load heavy routes for code splitting
+const Chat = lazy(() => import("./pages/Chat"));
+const Moods = lazy(() => import("./pages/Moods"));
+const Journal = lazy(() => import("./pages/Journal"));
+const JournalNew = lazy(() => import("./pages/JournalNew"));
+const JournalEdit = lazy(() => import("./pages/JournalEdit"));
+const Meditations = lazy(() => import("./pages/Meditations"));
+const MeditationPlayer = lazy(() => import("./pages/MeditationPlayer"));
+const Affirmations = lazy(() => import("./pages/Affirmations"));
+const Breathe = lazy(() => import("./pages/Breathe"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Settings = lazy(() => import("./pages/Settings"));
+const ProfileSecurity = lazy(() => import("./pages/settings/ProfileSecurity"));
+const Notifications = lazy(() => import("./pages/settings/Notifications"));
+const Help = lazy(() => import("./pages/settings/Help"));
+const About = lazy(() => import("./pages/settings/About"));
+const Legal = lazy(() => import("./pages/settings/Legal"));
+const Admin = lazy(() => import("./pages/Admin"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
 
@@ -50,7 +55,12 @@ const App = () => {
             <CommandPalette />
             <PWAInstallPrompt />
             <PWAUpdatePrompt />
-            <Routes>
+            <Suspense fallback={
+              <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            }>
+              <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/welcome" element={<Welcome />} />
             <Route path="/auth/login" element={<Login />} />
@@ -75,8 +85,9 @@ const App = () => {
             <Route path="/settings/about" element={<About />} />
             <Route path="/settings/legal" element={<Legal />} />
             <Route path="/admin" element={<Admin />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            </Suspense>
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>
