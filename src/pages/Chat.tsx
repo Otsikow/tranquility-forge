@@ -1,28 +1,24 @@
 import { useState, useRef, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { AppBar } from "@/components/AppBar";
 import { BottomNav } from "@/components/BottomNav";
-import { Leaf, Send } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-}
+import { Button } from "@/components/ui/button";
+import { Message } from "@/components/chat/Message";
+import { InputBar } from "@/components/chat/InputBar";
+import { SafetySheet } from "@/components/chat/SafetySheet";
+import { useChatStore } from "@/lib/useChatStore";
+import { streamChatCompletion } from "@/lib/aiClient";
+import { containsCrisisKeywords } from "@/lib/safety";
+import { useToast } from "@/components/ui/use-toast";
+import { Shield } from "lucide-react";
 
 export default function Chat() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      role: "assistant",
-      content: "Hello, I'm Peace. How are you feeling today?",
-    },
-  ]);
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const { messages, addMessage, updateMessage, markError, getContextMessages } = useChatStore();
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [showSafety, setShowSafety] = useState(false);
+  const [showCrisisBanner, setShowCrisisBanner] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const { toast } = useToast();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -32,68 +28,112 @@ export default function Chat() {
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: "user",
-      content: input.trim(),
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setIsLoading(true);
-
-    // Simulate AI response
-    setTimeout(() => {
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
+  useEffect(() => {
+    // Show welcome message if no messages
+    if (messages.length === 0) {
+      addMessage({
         role: "assistant",
-        content: "I understand. Sometimes just acknowledging our feelings can be a big step. What's on your mind?",
-      };
-      setMessages((prev) => [...prev, aiMessage]);
-      setIsLoading(false);
-    }, 1000);
+        content: "Hello, I'm Peace. How are you feeling today?",
+      });
+    }
+  }, []);
+
+  const handleStop = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setIsStreaming(false);
+  };
+
+  const handleSubmit = async (text: string) => {
+    // Check for crisis keywords
+    if (containsCrisisKeywords(text)) {
+      setShowCrisisBanner(true);
+    }
+
+    // Add user message
+    addMessage({ role: "user", content: text });
+
+    // Create assistant message placeholder
+    const assistantMsg = addMessage({ role: "assistant", content: "" });
+    
+    setIsStreaming(true);
+    abortControllerRef.current = new AbortController();
+
+    try {
+      const contextMessages = getContextMessages();
+      let fullResponse = "";
+
+      for await (const chunk of streamChatCompletion(contextMessages, {
+        signal: abortControllerRef.current.signal,
+      })) {
+        fullResponse += chunk;
+        updateMessage(assistantMsg.id, fullResponse);
+      }
+
+      setIsStreaming(false);
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        // User stopped the response
+        toast({
+          title: "Response stopped",
+          description: "You can continue the conversation anytime.",
+        });
+      } else {
+        console.error('Chat error:', error);
+        markError(assistantMsg.id);
+        toast({
+          title: "Error",
+          description: "Failed to get response. Please try again.",
+          variant: "destructive",
+        });
+      }
+      setIsStreaming(false);
+    } finally {
+      abortControllerRef.current = null;
+    }
   };
 
   return (
     <div className="min-h-screen bg-card flex flex-col pb-20">
       <AppBar title="Peace" />
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`flex gap-3 animate-fade-up ${
-              message.role === "user" ? "flex-row-reverse" : "flex-row"
-            }`}
-          >
-            <Avatar className="h-10 w-10 flex-shrink-0">
-              <AvatarFallback className={message.role === "assistant" ? "bg-primary" : "bg-muted"}>
-                {message.role === "assistant" ? <Leaf className="h-5 w-5 text-primary-foreground" /> : "Y"}
-              </AvatarFallback>
-            </Avatar>
-            <div
-              className={`max-w-[75%] rounded-2xl px-4 py-3 ${
-                message.role === "user"
-                  ? "bg-muted text-card-foreground"
-                  : "bg-primary/10 text-card-foreground"
-              }`}
-            >
-              <p className="text-sm">{message.content}</p>
+      {/* Crisis Banner */}
+      {showCrisisBanner && (
+        <div className="bg-destructive/10 border-b border-destructive/20 px-4 py-3">
+          <div className="flex items-start gap-2">
+            <Shield className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm text-destructive font-medium">
+                If you're in crisis, please reach out for immediate support.
+              </p>
+              <Button
+                variant="link"
+                className="h-auto p-0 text-destructive underline"
+                onClick={() => setShowSafety(true)}
+              >
+                View crisis resources
+              </Button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+        {messages.filter(m => m.role !== 'system').map((message) => (
+          <Message
+            key={message.id}
+            role={message.role as "user" | "assistant"}
+            content={message.content}
+            createdAt={message.createdAt}
+            isError={message.isError}
+          />
         ))}
-        {isLoading && (
+        
+        {isStreaming && (
           <div className="flex gap-3">
-            <Avatar className="h-10 w-10">
-              <AvatarFallback className="bg-primary">
-                <Leaf className="h-5 w-5 text-primary-foreground" />
-              </AvatarFallback>
-            </Avatar>
             <div className="bg-primary/10 rounded-2xl px-4 py-3">
               <div className="flex gap-1">
                 <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
@@ -103,24 +143,33 @@ export default function Chat() {
             </div>
           </div>
         )}
+        
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Safety Tips Button */}
+      <div className="px-4 py-2 border-t border-border/50">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowSafety(true)}
+          className="w-full"
+        >
+          <Shield className="h-4 w-4 mr-2" />
+          Safety & Wellbeing Resources
+        </Button>
+      </div>
+
       {/* Input */}
-      <form onSubmit={handleSend} className="border-t border-border bg-card px-4 py-3">
-        <div className="flex gap-2">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Share what's on your mind..."
-            className="flex-1 bg-input border-border text-card-foreground"
-            disabled={isLoading}
-          />
-          <Button type="submit" size="icon" disabled={isLoading || !input.trim()}>
-            <Send className="h-5 w-5" />
-          </Button>
-        </div>
-      </form>
+      <InputBar
+        disabled={isStreaming}
+        onSubmit={handleSubmit}
+        onStop={handleStop}
+        isStreaming={isStreaming}
+      />
+
+      {/* Safety Sheet */}
+      <SafetySheet open={showSafety} onOpenChange={setShowSafety} />
 
       <BottomNav />
     </div>
