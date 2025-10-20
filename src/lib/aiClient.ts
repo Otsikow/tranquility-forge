@@ -15,6 +15,7 @@ export async function* streamChatCompletion(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
     },
     body: JSON.stringify({
       messages: messages.map(({ role, content }) => ({ role, content })),
@@ -23,6 +24,7 @@ export async function* streamChatCompletion(
   });
 
   if (!response.ok) {
+    const errorText = await response.text();
     throw new Error(`AI service error: ${response.status}`);
   }
 
