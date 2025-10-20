@@ -17,6 +17,12 @@ import Journal from "./pages/Journal";
 import Affirmations from "./pages/Affirmations";
 import Breathe from "./pages/Breathe";
 import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
+import ProfileSecurity from "./pages/settings/ProfileSecurity";
+import Notifications from "./pages/settings/Notifications";
+import Help from "./pages/settings/Help";
+import About from "./pages/settings/About";
+import Legal from "./pages/settings/Legal";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
@@ -43,6 +49,12 @@ const App = () => (
             <Route path="/affirmations" element={<Affirmations />} />
             <Route path="/breathe" element={<Breathe />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/settings/profile-security" element={<ProfileSecurity />} />
+            <Route path="/settings/notifications" element={<Notifications />} />
+            <Route path="/settings/help" element={<Help />} />
+            <Route path="/settings/about" element={<About />} />
+            <Route path="/settings/legal" element={<Legal />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

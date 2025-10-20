@@ -58,7 +58,7 @@ export default function Dashboard() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => navigate("/profile")}
+              onClick={() => navigate("/settings")}
               className="text-foreground hover:text-foreground backdrop-blur-sm"
             >
               <Settings className="h-5 w-5" />

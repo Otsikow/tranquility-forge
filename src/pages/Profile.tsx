@@ -3,9 +3,10 @@ import { AppBar } from "@/components/AppBar";
 import { BottomNav } from "@/components/BottomNav";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, Settings, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ export default function Profile() {
     <div className="min-h-screen bg-card pb-20">
       <AppBar title="Profile" showBack={false} />
       
-      <div className="px-6 py-6 space-y-6">
+      <div className="px-6 py-6 space-y-6 max-w-2xl mx-auto">
         <Card className="bg-muted border-border">
           <CardContent className="pt-6 flex items-center gap-4">
             <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center">
@@ -33,6 +34,28 @@ export default function Profile() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Settings Link */}
+        <Link to="/settings">
+          <Card className="hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-4">
+                <div className="bg-primary/10 rounded-full p-3">
+                  <Settings className="w-6 h-6 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-card-foreground">
+                    Settings
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Manage your preferences and account
+                  </p>
+                </div>
+                <ChevronRight className="w-5 h-5 text-muted-foreground" />
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
 
         <Button variant="destructive" className="w-full" onClick={handleLogout}>
           <LogOut className="h-5 w-5 mr-2" />
