@@ -14,6 +14,101 @@ export type Database = {
   }
   public: {
     Tables: {
+      journal_entries: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          mood: number | null
+          tags: string[] | null
+          title: string | null
+          user_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          mood?: number | null
+          tags?: string[] | null
+          title?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          mood?: number | null
+          tags?: string[] | null
+          title?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      meditations: {
+        Row: {
+          audio_url: string | null
+          cover_url: string | null
+          created_at: string
+          description: string | null
+          duration_seconds: number
+          id: string
+          is_free: boolean | null
+          title: string
+        }
+        Insert: {
+          audio_url?: string | null
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          duration_seconds: number
+          id?: string
+          is_free?: boolean | null
+          title: string
+        }
+        Update: {
+          audio_url?: string | null
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number
+          id?: string
+          is_free?: boolean | null
+          title?: string
+        }
+        Relationships: []
+      }
+      sessions_played: {
+        Row: {
+          completed_at: string | null
+          id: string
+          meditation_id: string
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          id?: string
+          meditation_id: string
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          id?: string
+          meditation_id?: string
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sessions_played_meditation_id_fkey"
+            columns: ["meditation_id"]
+            isOneToOne: false
+            referencedRelation: "meditations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string | null
@@ -32,6 +127,30 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      users_profile: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          timezone: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          timezone?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          timezone?: string | null
         }
         Relationships: []
       }
