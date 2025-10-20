@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Mic, MicOff, Square, AlertCircle } from "lucide-react";
+import { Send, Mic, Square, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { supabase } from "@/integrations/supabase/client";
 
 interface InputBarProps {
   disabled: boolean;
@@ -12,108 +12,106 @@ interface InputBarProps {
   isStreaming: boolean;
 }
 
-declare global {
-  interface Window {
-    SpeechRecognition: any;
-    webkitSpeechRecognition: any;
-  }
-}
-
 export function InputBar({ disabled, onSubmit, onStop, isStreaming }: InputBarProps) {
   const [input, setInput] = useState("");
-  const [isListening, setIsListening] = useState(false);
-  const [speechError, setSpeechError] = useState<string | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const recognitionRef = useRef<any>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
   const { toast } = useToast();
 
-  const hasSpeechRecognition = typeof window !== 'undefined' && 
-    (window.SpeechRecognition || window.webkitSpeechRecognition);
-
-  useEffect(() => {
-    if (!hasSpeechRecognition) return;
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognitionRef.current = new SpeechRecognition();
-    recognitionRef.current.continuous = false;
-    recognitionRef.current.interimResults = true;
-
-    recognitionRef.current.onresult = (event: any) => {
-      const transcript = Array.from(event.results)
-        .map((result: any) => result[0].transcript)
-        .join('');
-      setInput(transcript);
-      setSpeechError(null);
-    };
-
-    recognitionRef.current.onerror = (event: any) => {
-      console.error('Speech recognition error:', event.error);
-      setIsListening(false);
-      
-      // Don't show toast for network errors - just update visual state
-      if (event.error === 'network') {
-        setSpeechError("offline");
-        return;
-      }
-      
-      let errorMessage = "Voice input failed. Please try typing instead.";
-      
-      switch (event.error) {
-        case 'not-allowed':
-        case 'permission-denied':
-          errorMessage = "Microphone access denied. Please allow permissions and try again.";
-          setSpeechError("permission");
-          break;
-        case 'no-speech':
-          // Don't show toast for no-speech, just reset
-          return;
-        case 'audio-capture':
-          errorMessage = "No microphone found.";
-          setSpeechError("no-mic");
-          break;
-        case 'aborted':
-          // User stopped - don't show error
-          return;
-      }
-      
-      toast({
-        title: "Voice input unavailable",
-        description: errorMessage,
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'audio/webm',
       });
-    };
 
-    recognitionRef.current.onend = () => {
-      setIsListening(false);
-    };
+      audioChunksRef.current = [];
 
-    return () => {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop();
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        await transcribeAudio(audioBlob);
+        
+        // Stop all tracks
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      mediaRecorderRef.current = mediaRecorder;
+      setIsRecording(true);
+
+    } catch (err) {
+      console.error('Microphone access error:', err);
+      toast({
+        title: "Microphone access denied",
+        description: "Please allow microphone access to use voice input.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const transcribeAudio = async (audioBlob: Blob) => {
+    setIsTranscribing(true);
+    
+    try {
+      // Convert blob to base64
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onloadend = () => {
+          const base64 = (reader.result as string).split(',')[1];
+          resolve(base64);
+        };
+        reader.onerror = reject;
+      });
+      
+      reader.readAsDataURL(audioBlob);
+      const base64Audio = await base64Promise;
+
+      console.log('Sending audio for transcription, size:', audioBlob.size);
+
+      // Call edge function
+      const { data, error } = await supabase.functions.invoke('transcribe-audio', {
+        body: { audio: base64Audio },
+      });
+
+      if (error) {
+        throw error;
       }
-    };
-  }, [hasSpeechRecognition, toast]);
 
-  const toggleVoiceInput = async () => {
-    if (!recognitionRef.current) return;
-
-    if (isListening) {
-      recognitionRef.current.stop();
-      setIsListening(false);
-    } else {
-      try {
-        // Check microphone permissions first
-        await navigator.mediaDevices.getUserMedia({ audio: true });
-        recognitionRef.current.start();
-        setIsListening(true);
-        setSpeechError(null);
-      } catch (err) {
-        console.error('Microphone access error:', err);
-        setSpeechError("permission");
+      if (data?.text) {
+        setInput(data.text);
         toast({
-          title: "Microphone access denied",
-          description: "Please allow microphone access to use voice input.",
+          title: "Transcription complete",
+          description: "Your voice has been converted to text.",
         });
+      } else {
+        throw new Error('No transcription received');
       }
+
+    } catch (error) {
+      console.error('Transcription error:', error);
+      toast({
+        title: "Transcription failed",
+        description: "Could not transcribe audio. Please try typing instead.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsTranscribing(false);
     }
   };
 
@@ -131,20 +129,6 @@ export function InputBar({ disabled, onSubmit, onStop, isStreaming }: InputBarPr
     }
   };
 
-  const getMicIcon = () => {
-    if (isListening) return <Mic className="h-5 w-5 animate-pulse" />;
-    if (speechError === "offline") return <MicOff className="h-5 w-5" />;
-    return <Mic className="h-5 w-5" />;
-  };
-
-  const getMicTooltip = () => {
-    if (speechError === "offline") return "Voice input requires internet connection";
-    if (speechError === "permission") return "Microphone access denied";
-    if (speechError === "no-mic") return "No microphone detected";
-    if (isListening) return "Stop recording";
-    return "Start voice input (requires internet)";
-  };
-
   return (
     <form onSubmit={handleSubmit} className="border-t border-border bg-card px-4 py-3">
       <div className="flex gap-2 items-end">
@@ -155,36 +139,44 @@ export function InputBar({ disabled, onSubmit, onStop, isStreaming }: InputBarPr
           onKeyDown={handleKeyDown}
           placeholder="Share what's on your mind..."
           className="flex-1 min-h-[44px] max-h-[120px] resize-none"
-          disabled={disabled}
+          disabled={disabled || isTranscribing}
           aria-label="Message input"
         />
         
-        {hasSpeechRecognition && (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="button"
-                  size="icon"
-                  variant={speechError === "offline" ? "secondary" : "outline"}
-                  onClick={toggleVoiceInput}
-                  disabled={disabled || speechError === "permission"}
-                  aria-label={getMicTooltip()}
-                  className={isListening ? "bg-primary text-primary-foreground" : ""}
-                >
-                  {getMicIcon()}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="flex items-center gap-1">
-                  {speechError === "offline" && <AlertCircle className="h-3 w-3" />}
-                  {getMicTooltip()}
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+        {/* Voice Input Button */}
+        {isTranscribing ? (
+          <Button
+            type="button"
+            size="icon"
+            variant="outline"
+            disabled
+          >
+            <Loader2 className="h-5 w-5 animate-spin" />
+          </Button>
+        ) : isRecording ? (
+          <Button
+            type="button"
+            size="icon"
+            variant="destructive"
+            onClick={stopRecording}
+            aria-label="Stop recording"
+          >
+            <Square className="h-5 w-5" />
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            size="icon"
+            variant="outline"
+            onClick={startRecording}
+            disabled={disabled}
+            aria-label="Start voice input"
+          >
+            <Mic className="h-5 w-5" />
+          </Button>
         )}
 
+        {/* Send/Stop Button */}
         {isStreaming ? (
           <Button
             type="button"
@@ -199,7 +191,7 @@ export function InputBar({ disabled, onSubmit, onStop, isStreaming }: InputBarPr
           <Button
             type="submit"
             size="icon"
-            disabled={disabled || !input.trim()}
+            disabled={disabled || !input.trim() || isTranscribing}
             aria-label="Send message"
           >
             <Send className="h-5 w-5" />
@@ -207,10 +199,17 @@ export function InputBar({ disabled, onSubmit, onStop, isStreaming }: InputBarPr
         )}
       </div>
       
-      {speechError === "offline" && (
+      {isRecording && (
+        <p className="text-xs text-primary mt-2 flex items-center gap-1 animate-pulse">
+          <Mic className="h-3 w-3" />
+          Recording... Click the button again to stop
+        </p>
+      )}
+      
+      {isTranscribing && (
         <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-          <AlertCircle className="h-3 w-3" />
-          Voice input requires an active internet connection. You can type your message instead.
+          <Loader2 className="h-3 w-3 animate-spin" />
+          Transcribing your voice...
         </p>
       )}
     </form>
