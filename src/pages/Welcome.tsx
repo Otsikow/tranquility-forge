@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Leaf, Heart, BookOpen, MessageCircle } from "lucide-react";
-import heroImage from "@/assets/hero-lake.jpg";
+import heroImage from "@/assets/banff-lake.jpg";
 
 const onboardingSteps = [
   {
@@ -48,7 +48,7 @@ export default function Welcome() {
       <div className="relative h-64 md:h-80 overflow-hidden">
         <img
           src={heroImage}
-          alt="Peaceful mountain lake"
+          alt="Serene turquoise lake surrounded by majestic snow-capped mountains"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-card" />

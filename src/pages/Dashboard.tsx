@@ -7,6 +7,7 @@ import { MoodChart } from "@/components/MoodChart";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Leaf, BookOpen, Wind, MessageCircle, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import maldivesImage from "@/assets/maldives.jpg";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -34,29 +35,49 @@ export default function Dashboard() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-card pb-20">
-      {/* Header */}
-      <div className="bg-card border-b border-border px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Leaf className="h-8 w-8 text-primary" />
-          <h1 className="text-lg font-semibold text-foreground">
-            Good morning, {userName}
-          </h1>
+    <div className="min-h-screen bg-background pb-20">
+      {/* Hero Section with Image */}
+      <div className="relative h-56 md:h-64 overflow-hidden">
+        <img
+          src={maldivesImage}
+          alt="Peaceful tropical paradise with crystal-clear waters"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background" />
+        
+        {/* Header Overlay */}
+        <div className="absolute top-0 left-0 right-0 px-6 py-4 flex items-center justify-between backdrop-blur-sm bg-background/30">
+          <div className="flex items-center gap-3">
+            <Leaf className="h-8 w-8 text-primary" />
+            <h1 className="text-lg font-semibold text-foreground drop-shadow-md">
+              Good morning, {userName}
+            </h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate("/profile")}
+              className="text-foreground hover:text-foreground backdrop-blur-sm"
+            >
+              <Settings className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/profile")}
-            className="text-foreground hover:text-foreground"
-          >
-            <Settings className="h-5 w-5" />
-          </Button>
+
+        {/* Welcome Message */}
+        <div className="absolute bottom-6 left-6 right-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground drop-shadow-lg mb-2">
+            How are you feeling today?
+          </h2>
+          <p className="text-foreground/90 drop-shadow-md">
+            Take a moment to reflect on your wellbeing
+          </p>
         </div>
       </div>
 
-      <div className="px-6 py-6 space-y-6 animate-fade-up">
+      <div className="px-6 py-6 space-y-6 animate-fade-up max-w-4xl mx-auto">
         {/* Mood Chart */}
         <Card className="bg-muted border-border">
           <CardHeader>
