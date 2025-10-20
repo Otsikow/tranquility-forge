@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      downloads: {
+        Row: {
+          downloaded_at: string | null
+          evicted: boolean | null
+          file_size: number
+          id: string
+          last_accessed_at: string | null
+          meditation_id: string
+          user_id: string
+        }
+        Insert: {
+          downloaded_at?: string | null
+          evicted?: boolean | null
+          file_size: number
+          id?: string
+          last_accessed_at?: string | null
+          meditation_id: string
+          user_id: string
+        }
+        Update: {
+          downloaded_at?: string | null
+          evicted?: boolean | null
+          file_size?: number
+          id?: string
+          last_accessed_at?: string | null
+          meditation_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "downloads_meditation_id_fkey"
+            columns: ["meditation_id"]
+            isOneToOne: false
+            referencedRelation: "meditations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       journal_entries: {
         Row: {
           content: string | null
@@ -225,6 +263,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_user_download_size: {
+        Args: { p_user_id: string }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

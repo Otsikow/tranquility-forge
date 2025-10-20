@@ -286,23 +286,214 @@ Required PWA and iOS-specific meta tags:
 - Offline mutations queued securely (Phase 2)
 - No tracking in PWA parameters
 
-## Next Steps
+## Phase Status
 
-### Phase 2: Push Notifications & Background Sync
-- Web Push API with VAPID keys
-- Background sync for journal/mood entries
-- Push preferences UI
+### Phase 1: Core PWA Setup ✅
+- Web app manifest with icons and shortcuts
+- Service worker with caching strategies
+- Offline fallback page
+- Install prompts (Android, iOS, Desktop)
+- Update notification system
 
-### Phase 3: Offline Data & Media
-- IndexedDB for journals (200 entries)
-- Mood chart data (60 days)
-- Meditation downloads with quota management
+### Phase 2: Push Notifications & Background Sync ✅
+- Web Push API with VAPID authentication
+- Background sync for write operations
+- Push notification preferences UI
+- Sync queue with retry logic
+- Periodic background sync (Chrome)
 
-### Phase 4: Performance Optimization
+### Phase 3: Offline Data & Media ✅
+- IndexedDB for journals (last 200 entries)
+- IndexedDB for moods (60 days)
+- Meditation downloads with offline playback
+- LRU eviction for storage management
+- Download manager UI with quota monitoring
+- Storage statistics and cleanup
+
+### Phase 4: Performance Optimization (Planned)
 - Code splitting for heavy routes
-- Image optimization (srcset, lazy load)
+- Image optimization (srcset, lazy load, WebP)
 - Preconnect/DNS-prefetch for APIs
+- Font optimization (font-display: swap)
+- Critical CSS inline
 - Target: Lighthouse Performance ≥90
+
+## Offline Data Features (Phase 3)
+
+### IndexedDB Storage
+
+Peace uses IndexedDB for robust offline data storage:
+
+**Database**: `PeaceOfflineDB`
+
+**Stores**:
+- `journals`: Last 200 journal entries
+- `moods`: Last 60 days of mood tracking
+- `meditations`: Downloaded audio files as Blobs
+- `metadata`: Storage statistics and cleanup info
+
+### Journals Offline
+
+```typescript
+import { saveJournalOffline, getOfflineJournals } from "@/lib/offlineStorage";
+
+// Save journal offline
+await saveJournalOffline({
+  id: '...',
+  title: 'My Entry',
+  content: '...',
+  mood: 4,
+  created_at: new Date().toISOString(),
+});
+
+// Retrieve offline journals
+const journals = await getOfflineJournals(200); // Last 200
+```
+
+**Features**:
+- Automatic LRU eviction (keeps last 200)
+- Sync status tracking
+- Size monitoring
+
+### Moods Offline
+
+```typescript
+import { saveMoodOffline, getOfflineMoods } from "@/lib/offlineStorage";
+
+// Save mood offline
+await saveMoodOffline({
+  id: '...',
+  mood: 5,
+  note: 'Feeling great!',
+  created_at: new Date().toISOString(),
+});
+
+// Retrieve last 60 days
+const moods = await getOfflineMoods(60);
+```
+
+**Features**:
+- Rolling 60-day window
+- Automatic cleanup of old entries
+- Sync status tracking
+
+### Meditation Downloads
+
+```typescript
+import {
+  downloadMeditationOffline,
+  getOfflineMeditation,
+  isMeditationDownloaded,
+  deleteMeditationOffline
+} from "@/lib/offlineStorage";
+
+// Check if downloaded
+const isDownloaded = await isMeditationDownloaded(meditationId);
+
+// Download for offline
+await downloadMeditationOffline(
+  meditationId,
+  'Peaceful Sleep',
+  'https://audio-url.com/file.mp3'
+);
+
+// Get offline audio
+const audioBlob = await getOfflineMeditation(meditationId);
+const url = URL.createObjectURL(audioBlob);
+
+// Delete download
+await deleteMeditationOffline(meditationId);
+```
+
+**Features**:
+- Full audio file download
+- LRU eviction when quota exceeded
+- Last accessed timestamp tracking
+- Storage quota management
+
+### Storage Quotas
+
+**Limits**:
+- Total storage: 200 MB
+- Journals: 10 MB
+- Moods: 1 MB  
+- Meditations: 100 MB each
+
+**Quota Management**:
+```typescript
+import { getStorageStats, checkStorageQuota } from "@/lib/offlineStorage";
+
+// Get Peace storage stats
+const stats = await getStorageStats();
+console.log(stats.total.percentUsed); // 45.2
+
+// Get browser storage quota
+const quota = await checkStorageQuota();
+console.log(quota.usage, quota.quota);
+```
+
+**LRU Eviction**:
+- Automatically removes least recently accessed meditations
+- Frees space when quota exceeded
+- User notified before large downloads
+
+### Using Offline Hooks
+
+**useOfflineJournals**:
+```typescript
+import { useOfflineJournals } from "@/hooks/useOfflineJournals";
+
+const { journals, isLoading, isOnline, createJournal, refreshJournals } = useOfflineJournals();
+
+// Create journal (auto-syncs if online)
+await createJournal({
+  id: uuidv4(),
+  title: 'Test',
+  content: 'Content',
+  created_at: new Date().toISOString(),
+});
+```
+
+**useOfflineMeditation**:
+```typescript
+import { useOfflineMeditation } from "@/hooks/useOfflineMeditation";
+
+const {
+  isDownloaded,
+  isDownloading,
+  download,
+  remove,
+  getAudioUrl
+} = useOfflineMeditation(meditationId, audioUrl, title);
+
+// Download meditation
+await download();
+
+// Get audio URL (offline or online)
+const audioSrc = getAudioUrl();
+```
+
+### Download Manager UI
+
+**Component**: `<DownloadManager />`
+
+**Features**:
+- Storage overview with progress bars
+- Downloaded meditations list
+- Delete individual downloads
+- Clear all offline data
+- Browser quota display
+- Storage statistics (journals, moods, meditations)
+
+**Usage**:
+```tsx
+import { DownloadManager } from "@/components/DownloadManager";
+
+// In settings page
+<DownloadManager />
+```
+
+## Next Steps
 
 ## Resources
 
