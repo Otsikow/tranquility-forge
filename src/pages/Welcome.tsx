@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Leaf, Heart, BookOpen, MessageCircle } from "lucide-react";
-import heroImage from "@/assets/banff-lake.jpg";
+import logoImage from "@/assets/logo.png";
+import heroImage from "@/assets/koi-fish.jpg";
 
 const onboardingSteps = [
   {
@@ -48,14 +49,20 @@ export default function Welcome() {
       <div className="relative h-64 md:h-80 overflow-hidden">
         <img
           src={heroImage}
-          alt="Serene turquoise lake surrounded by majestic snow-capped mountains"
+          alt="Peaceful koi fish swimming in tranquil pond"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-card" />
+        
+        {/* Logo overlay */}
+        <div className="absolute top-6 left-6">
+          <img src={logoImage} alt="Peace Logo" className="h-14 w-14 drop-shadow-lg" />
+        </div>
       </div>
 
       {/* Content */}
       <div className="flex-1 px-6 pt-8 pb-24 flex flex-col items-center text-center animate-fade-up">
+        <img src={logoImage} alt="Peace Logo" className="h-20 w-20 mb-4" />
         <h1 className="text-3xl md:text-4xl font-bold text-card-foreground mb-3">
           Welcome to Peace
         </h1>

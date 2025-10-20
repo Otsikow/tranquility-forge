@@ -7,7 +7,8 @@ import { MoodChart } from "@/components/MoodChart";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Leaf, BookOpen, Wind, MessageCircle, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import maldivesImage from "@/assets/maldives.jpg";
+import logoImage from "@/assets/logo.png";
+import hummingbirdImage from "@/assets/hummingbird.png";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -39,8 +40,8 @@ export default function Dashboard() {
       {/* Hero Section with Image */}
       <div className="relative h-56 md:h-64 overflow-hidden">
         <img
-          src={maldivesImage}
-          alt="Peaceful tropical paradise with crystal-clear waters"
+          src={hummingbirdImage}
+          alt="Vibrant hummingbird feeding from flower"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background" />
@@ -48,7 +49,7 @@ export default function Dashboard() {
         {/* Header Overlay */}
         <div className="absolute top-0 left-0 right-0 px-6 py-4 flex items-center justify-between backdrop-blur-sm bg-background/30">
           <div className="flex items-center gap-3">
-            <Leaf className="h-8 w-8 text-primary" />
+            <img src={logoImage} alt="Peace Logo" className="h-10 w-10 drop-shadow-lg" />
             <h1 className="text-lg font-semibold text-foreground drop-shadow-md">
               Good morning, {userName}
             </h1>

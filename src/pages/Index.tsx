@@ -3,49 +3,50 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Leaf, Heart, BookOpen, MessageCircle, Wind, Sparkles } from "lucide-react";
 import { Footer } from "@/components/Footer";
-import banffImage from "@/assets/banff-lake.jpg";
-import boraBoraImage from "@/assets/bora-bora.jpg";
-import cappadociaImage from "@/assets/cappadocia.jpg";
-import icelandImage from "@/assets/iceland-lights.jpg";
-import maldivesImage from "@/assets/maldives.jpg";
-import victoriaFallsImage from "@/assets/victoria-falls.jpg";
+import logoImage from "@/assets/logo.png";
+import eagleImage from "@/assets/bald-eagle.jpg";
+import bettaFishImage from "@/assets/betta-fish.jpg";
+import dragonflyImage from "@/assets/dragonfly.jpg";
+import hummingbirdImage from "@/assets/hummingbird.png";
+import koiFishImage from "@/assets/koi-fish.jpg";
+import mantaRayImage from "@/assets/manta-ray.jpg";
 
 const features = [
   {
     icon: Leaf,
     title: "Guided Meditations",
     description: "Find your inner calm with our curated meditation library",
-    image: icelandImage,
+    image: koiFishImage,
   },
   {
     icon: Heart,
     title: "Mood Tracking",
     description: "Understand your emotional patterns and celebrate your progress",
-    image: maldivesImage,
+    image: bettaFishImage,
   },
   {
     icon: BookOpen,
     title: "Personal Journal",
     description: "Reflect, grow, and track your mindfulness journey",
-    image: cappadociaImage,
+    image: hummingbirdImage,
   },
   {
     icon: MessageCircle,
     title: "AI Companion",
     description: "Chat with Peace, your empathetic AI wellbeing assistant",
-    image: boraBoraImage,
+    image: dragonflyImage,
   },
   {
     icon: Wind,
     title: "Breathing Exercises",
     description: "Calm your mind with guided breathing techniques",
-    image: victoriaFallsImage,
+    image: mantaRayImage,
   },
   {
     icon: Sparkles,
     title: "Daily Affirmations",
     description: "Start each day with positive, uplifting messages",
-    image: banffImage,
+    image: eagleImage,
   },
 ];
 
@@ -55,14 +56,20 @@ export default function Index() {
       {/* Hero Section */}
       <section className="relative h-[70vh] md:h-[80vh] overflow-hidden">
         <img
-          src={banffImage}
-          alt="Peaceful mountain landscape"
+          src={eagleImage}
+          alt="Bald eagle soaring over majestic mountains"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/60 to-background" />
         
+        {/* Logo in top left */}
+        <div className="absolute top-6 left-6 z-10">
+          <img src={logoImage} alt="Peace Logo" className="h-16 w-16 drop-shadow-lg" />
+        </div>
+        
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-          <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-6 animate-fade-up">
+          <img src={logoImage} alt="Peace Logo" className="h-24 w-24 mb-4 drop-shadow-xl animate-fade-up" />
+          <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-6 animate-fade-up" style={{ animationDelay: '0.1s' }}>
             Welcome to Peace
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl animate-fade-up" style={{ animationDelay: '0.2s' }}>
@@ -132,8 +139,8 @@ export default function Index() {
       <section className="relative py-20 px-6 overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src={maldivesImage}
-            alt="Serene beach"
+            src={mantaRayImage}
+            alt="Manta ray gliding peacefully underwater"
             className="w-full h-full object-cover opacity-30"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-background via-background/80 to-background" />
