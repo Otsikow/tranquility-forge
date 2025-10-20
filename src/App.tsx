@@ -16,6 +16,8 @@ import Moods from "./pages/Moods";
 import Journal from "./pages/Journal";
 import JournalNew from "./pages/JournalNew";
 import JournalEdit from "./pages/JournalEdit";
+import Meditations from "./pages/Meditations";
+import MeditationPlayer from "./pages/MeditationPlayer";
 import Affirmations from "./pages/Affirmations";
 import Breathe from "./pages/Breathe";
 import Profile from "./pages/Profile";
@@ -50,6 +52,8 @@ const App = () => (
             <Route path="/journal" element={<Journal />} />
             <Route path="/journal/new" element={<JournalNew />} />
             <Route path="/journal/:id" element={<JournalEdit />} />
+            <Route path="/meditations" element={<Meditations />} />
+            <Route path="/meditations/:id" element={<MeditationPlayer />} />
             <Route path="/affirmations" element={<Affirmations />} />
             <Route path="/breathe" element={<Breathe />} />
             <Route path="/profile" element={<Profile />} />
