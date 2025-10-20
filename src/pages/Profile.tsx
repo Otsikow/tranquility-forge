@@ -22,7 +22,7 @@ export default function Profile() {
     <div className="min-h-screen bg-card pb-20">
       <AppBar title="Profile" showBack={false} />
       
-      <div className="px-6 py-6 space-y-6 max-w-2xl mx-auto">
+      <div className="px-6 py-8 space-y-8 max-w-2xl mx-auto">
         <Card className="bg-muted border-border">
           <CardContent className="pt-6 flex items-center gap-4">
             <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center">
