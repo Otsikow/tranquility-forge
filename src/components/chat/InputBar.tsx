@@ -46,9 +46,31 @@ export function InputBar({ disabled, onSubmit, onStop, isStreaming }: InputBarPr
     recognitionRef.current.onerror = (event: any) => {
       console.error('Speech recognition error:', event.error);
       setIsListening(false);
+      
+      let errorMessage = "Could not process voice input. Please try again.";
+      
+      switch (event.error) {
+        case 'network':
+          errorMessage = "Network error. Voice input requires an internet connection. Please check your connection and try again.";
+          break;
+        case 'not-allowed':
+        case 'permission-denied':
+          errorMessage = "Microphone access denied. Please allow microphone permissions in your browser settings.";
+          break;
+        case 'no-speech':
+          errorMessage = "No speech detected. Please try speaking again.";
+          break;
+        case 'audio-capture':
+          errorMessage = "No microphone found. Please check your audio device.";
+          break;
+        case 'aborted':
+          // User stopped - don't show error
+          return;
+      }
+      
       toast({
         title: "Voice input error",
-        description: "Could not process voice input. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     };
@@ -64,15 +86,26 @@ export function InputBar({ disabled, onSubmit, onStop, isStreaming }: InputBarPr
     };
   }, [hasSpeechRecognition, toast]);
 
-  const toggleVoiceInput = () => {
+  const toggleVoiceInput = async () => {
     if (!recognitionRef.current) return;
 
     if (isListening) {
       recognitionRef.current.stop();
       setIsListening(false);
     } else {
-      recognitionRef.current.start();
-      setIsListening(true);
+      try {
+        // Check microphone permissions first
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+        recognitionRef.current.start();
+        setIsListening(true);
+      } catch (err) {
+        console.error('Microphone access error:', err);
+        toast({
+          title: "Microphone access denied",
+          description: "Please allow microphone access in your browser settings to use voice input.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
