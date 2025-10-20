@@ -14,6 +14,8 @@ import Dashboard from "./pages/Dashboard";
 import Chat from "./pages/Chat";
 import Moods from "./pages/Moods";
 import Journal from "./pages/Journal";
+import JournalNew from "./pages/JournalNew";
+import JournalEdit from "./pages/JournalEdit";
 import Affirmations from "./pages/Affirmations";
 import Breathe from "./pages/Breathe";
 import Profile from "./pages/Profile";
@@ -46,6 +48,8 @@ const App = () => (
             <Route path="/chat" element={<Chat />} />
             <Route path="/moods" element={<Moods />} />
             <Route path="/journal" element={<Journal />} />
+            <Route path="/journal/new" element={<JournalNew />} />
+            <Route path="/journal/:id" element={<JournalEdit />} />
             <Route path="/affirmations" element={<Affirmations />} />
             <Route path="/breathe" element={<Breathe />} />
             <Route path="/profile" element={<Profile />} />
