@@ -1,8 +1,9 @@
 // Peace PWA Service Worker v2025.10.20
-const CACHE_VERSION = 'peace-v1';
+const CACHE_VERSION = 'peace-v2';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 const OFFLINE_URL = '/offline.html';
+const SYNC_QUEUE_NAME = 'peace-write-ops';
 
 // Assets to pre-cache on install
 const STATIC_ASSETS = [
@@ -138,6 +139,151 @@ self.addEventListener('fetch', (event) => {
         return response;
       })
       .catch(() => caches.match(request))
+  );
+});
+
+// Background Sync event - retry failed operations
+self.addEventListener('sync', (event) => {
+  console.log('[SW] Background sync event:', event.tag);
+  
+  if (event.tag === SYNC_QUEUE_NAME) {
+    event.waitUntil(processQueue());
+  }
+});
+
+// Process queued operations
+async function processQueue() {
+  console.log('[SW] Processing background sync queue...');
+  
+  try {
+    // Get queued operations from IndexedDB
+    const db = await openDB();
+    const tx = db.transaction('syncQueue', 'readonly');
+    const store = tx.objectStore('syncQueue');
+    const queuedOps = await store.getAll();
+    
+    console.log(`[SW] Found ${queuedOps.length} queued operations`);
+    
+    for (const op of queuedOps) {
+      try {
+        await retryOperation(op);
+        
+        // Remove from queue after successful retry
+        const deleteTx = db.transaction('syncQueue', 'readwrite');
+        const deleteStore = deleteTx.objectStore('syncQueue');
+        await deleteStore.delete(op.id);
+        
+        console.log('[SW] Successfully synced operation:', op.id);
+      } catch (error) {
+        console.error('[SW] Failed to sync operation:', op.id, error);
+        // Keep in queue for next sync attempt
+      }
+    }
+  } catch (error) {
+    console.error('[SW] Background sync failed:', error);
+    throw error;
+  }
+}
+
+// Retry a failed operation
+async function retryOperation(op) {
+  const { url, method, body, headers } = op.request;
+  
+  const response = await fetch(url, {
+    method,
+    headers: headers || {},
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+  
+  return response;
+}
+
+// Open IndexedDB for sync queue
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('PeaceDB', 1);
+    
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains('syncQueue')) {
+        db.createObjectStore('syncQueue', { keyPath: 'id' });
+      }
+    };
+  });
+}
+
+// Periodic sync for affirmations (if supported)
+self.addEventListener('periodicsync', (event) => {
+  console.log('[SW] Periodic sync event:', event.tag);
+  
+  if (event.tag === 'refresh-affirmations') {
+    event.waitUntil(refreshAffirmations());
+  }
+});
+
+// Refresh affirmations in background
+async function refreshAffirmations() {
+  try {
+    const response = await fetch('/api/affirmations/daily');
+    if (response.ok) {
+      const data = await response.json();
+      // Cache the fresh data
+      const cache = await caches.open(DYNAMIC_CACHE);
+      await cache.put('/api/affirmations/daily', new Response(JSON.stringify(data)));
+      console.log('[SW] Affirmations refreshed');
+    }
+  } catch (error) {
+    console.error('[SW] Failed to refresh affirmations:', error);
+  }
+}
+
+// Push notification event
+self.addEventListener('push', (event) => {
+  console.log('[SW] Push notification received');
+  
+  const data = event.data ? event.data.json() : {};
+  const title = data.title || 'Peace';
+  const options = {
+    body: data.body || 'You have a new notification',
+    icon: '/logo.png',
+    badge: '/logo.png',
+    vibrate: [200, 100, 200],
+    data: data.url ? { url: data.url } : undefined,
+    actions: data.actions || [],
+  };
+  
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  );
+});
+
+// Notification click event
+self.addEventListener('notificationclick', (event) => {
+  console.log('[SW] Notification clicked');
+  event.notification.close();
+  
+  const urlToOpen = event.notification.data?.url || '/';
+  
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // Check if there's already a window open
+      for (const client of clientList) {
+        if (client.url === urlToOpen && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      // Open new window if none exists
+      if (clients.openWindow) {
+        return clients.openWindow(urlToOpen);
+      }
+    })
   );
 });
 

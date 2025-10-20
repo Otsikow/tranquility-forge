@@ -77,6 +77,39 @@ export type Database = {
         }
         Relationships: []
       }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string | null
+          endpoint: string
+          id: string
+          last_used_at: string | null
+          p256dh: string
+          topics: string[] | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string | null
+          endpoint: string
+          id?: string
+          last_used_at?: string | null
+          p256dh: string
+          topics?: string[] | null
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string | null
+          endpoint?: string
+          id?: string
+          last_used_at?: string | null
+          p256dh?: string
+          topics?: string[] | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       sessions_played: {
         Row: {
           completed_at: string | null
@@ -108,6 +141,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      sync_queue: {
+        Row: {
+          attempts: number | null
+          created_at: string | null
+          id: string
+          operation_type: string
+          payload: Json
+          processed_at: string | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          attempts?: number | null
+          created_at?: string | null
+          id?: string
+          operation_type: string
+          payload: Json
+          processed_at?: string | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          attempts?: number | null
+          created_at?: string | null
+          id?: string
+          operation_type?: string
+          payload?: Json
+          processed_at?: string | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
