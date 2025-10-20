@@ -37,10 +37,10 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <TooltipProvider>
-        <CommandPalette />
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <CommandPalette />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/welcome" element={<Welcome />} />
