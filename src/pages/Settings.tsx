@@ -46,7 +46,7 @@ const settingsSections = [
 export default function Settings() {
   return (
     <div className="min-h-screen bg-background pb-20">
-      <AppBar title="Settings" showBack />
+      <AppBar title="Settings" showBack backTo="/dashboard" />
 
       {/* Hero Section */}
       <div className="relative h-40 md:h-48 overflow-hidden">

@@ -41,7 +41,7 @@ const affirmations = [
 export default function Affirmations() {
   return (
     <div className="min-h-screen bg-background pb-20">
-      <AppBar title="Affirmations" showBack />
+      <AppBar title="Affirmations" showBack backTo="/dashboard" />
 
       {/* Hero Section */}
       <div className="relative h-52 md:h-64 overflow-hidden">

@@ -5,11 +5,12 @@ import { Button } from "./ui/button";
 interface AppBarProps {
   title: string;
   showBack?: boolean;
+  backTo?: string;
   showSettings?: boolean;
   onSettingsClick?: () => void;
 }
 
-export const AppBar = ({ title, showBack = true, showSettings = false, onSettingsClick }: AppBarProps) => {
+export const AppBar = ({ title, showBack = true, backTo, showSettings = false, onSettingsClick }: AppBarProps) => {
   const navigate = useNavigate();
 
   return (
@@ -19,7 +20,7 @@ export const AppBar = ({ title, showBack = true, showSettings = false, onSetting
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate(-1)}
+            onClick={() => backTo ? navigate(backTo) : navigate(-1)}
             className="h-9 w-9 text-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-5 w-5" />

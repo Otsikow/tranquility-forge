@@ -100,7 +100,7 @@ export default function JournalNew() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <AppBar title="New Journal Entry" showBack />
+      <AppBar title="New Journal Entry" showBack backTo="/journal" />
 
       <form onSubmit={handleSubmit} className="px-6 py-6 space-y-6 max-w-2xl mx-auto">
         {/* Mood Slider */}

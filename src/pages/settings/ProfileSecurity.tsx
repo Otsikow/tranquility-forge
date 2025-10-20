@@ -15,7 +15,7 @@ export default function ProfileSecurity() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <AppBar title="Profile & Security" showBack />
+      <AppBar title="Profile & Security" showBack backTo="/settings" />
 
       <div className="px-6 py-6 space-y-6 max-w-2xl mx-auto">
         {/* Profile Section */}

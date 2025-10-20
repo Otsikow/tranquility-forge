@@ -8,7 +8,7 @@ import banffImage from "@/assets/banff-lake.jpg";
 export default function About() {
   return (
     <div className="min-h-screen bg-background pb-20">
-      <AppBar title="About Peace" showBack />
+      <AppBar title="About Peace" showBack backTo="/settings" />
 
       {/* Hero Section */}
       <div className="relative h-56 md:h-64 overflow-hidden">

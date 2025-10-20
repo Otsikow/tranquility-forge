@@ -60,7 +60,7 @@ const faqItems = [
 export default function Help() {
   return (
     <div className="min-h-screen bg-background pb-20">
-      <AppBar title="Help & Support" showBack />
+      <AppBar title="Help & Support" showBack backTo="/settings" />
 
       <div className="px-6 py-6 space-y-6 max-w-2xl mx-auto">
         {/* Contact Options */}

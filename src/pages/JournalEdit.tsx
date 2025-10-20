@@ -151,7 +151,7 @@ export default function JournalEdit() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <AppBar title="Edit Entry" showBack />
+      <AppBar title="Edit Entry" showBack backTo="/journal" />
 
       <form onSubmit={handleSubmit} className="px-6 py-6 space-y-6 max-w-2xl mx-auto">
         {/* Mood Slider */}

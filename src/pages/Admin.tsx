@@ -105,7 +105,7 @@ export default function Admin() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <AppBar title="Admin Dashboard" showBack={true} />
+      <AppBar title="Admin Dashboard" showBack={true} backTo="/settings" />
       
       <div className="flex-1 px-6 py-6 space-y-6">
         {/* Stats Overview */}

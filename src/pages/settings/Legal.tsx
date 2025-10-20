@@ -33,7 +33,7 @@ const legalDocuments = [
 export default function Legal() {
   return (
     <div className="min-h-screen bg-background pb-20">
-      <AppBar title="Legal" showBack />
+      <AppBar title="Legal" showBack backTo="/settings" />
 
       <div className="px-6 py-6 space-y-6 max-w-2xl mx-auto">
         <div className="text-center space-y-2 mb-8">

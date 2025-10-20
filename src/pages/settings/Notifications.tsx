@@ -50,7 +50,7 @@ export default function Notifications() {
 
   return (
     <div className="min-h-screen bg-card pb-20">
-      <AppBar title="Notifications" showBack />
+      <AppBar title="Notifications" showBack backTo="/settings" />
       
       <div className="p-6 space-y-6">
         {/* Test Notification */}

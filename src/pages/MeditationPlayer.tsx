@@ -130,7 +130,7 @@ export default function MeditationPlayer() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <AppBar title={meditation.title} showBack />
+      <AppBar title={meditation.title} showBack backTo="/meditations" />
 
       <div className="px-6 py-6 max-w-2xl mx-auto space-y-6">
         {/* Cover Image */}
