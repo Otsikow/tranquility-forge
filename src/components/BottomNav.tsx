@@ -1,8 +1,10 @@
 import {
   Home,
+  Heart,
   BookOpen,
   Music,
   MessageCircle,
+  Users,
   User,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
@@ -10,9 +12,11 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { icon: Home, label: "Home", path: "/dashboard" },
+  { icon: Heart, label: "Wellness", path: "/wellness" },
   { icon: BookOpen, label: "Journal", path: "/journal" },
   { icon: Music, label: "Meditate", path: "/meditations" },
   { icon: MessageCircle, label: "Chat", path: "/chat" },
+  { icon: Users, label: "Community", path: "/community" },
   { icon: User, label: "Profile", path: "/profile" },
 ];
 
@@ -37,13 +41,17 @@ export const BottomNav = () => {
                   : "text-muted-foreground hover:text-primary"
               )}
             >
-              <div className={cn(
-                "h-9 w-9 rounded-full flex items-center justify-center",
-                isActive ? "bg-primary/10" : ""
-              )}>
+              <div
+                className={cn(
+                  "h-9 w-9 rounded-full flex items-center justify-center",
+                  isActive ? "bg-primary/10" : ""
+                )}
+              >
                 <Icon className="h-5 w-5" />
               </div>
-              <span className="text-[11px] font-medium leading-none">{item.label}</span>
+              <span className="text-[11px] font-medium leading-none">
+                {item.label}
+              </span>
             </Link>
           );
         })}

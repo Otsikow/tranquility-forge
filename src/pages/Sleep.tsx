@@ -14,7 +14,8 @@ import {
   Star,
   Lock,
   TrendingUp,
-  Calendar
+  Calendar,
+  ArrowLeft
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SleepStory, Soundscape, SleepTracking } from "@/types/db";
@@ -123,9 +124,16 @@ export default function Sleep() {
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
       <div className="bg-card border-b border-border px-6 py-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Sleep & Relaxation</h1>
-          <p className="text-muted-foreground">Stories, sounds, and tracking for better sleep</p>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/dashboard">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Sleep & Relaxation</h1>
+            <p className="text-muted-foreground">Stories, sounds, and tracking for better sleep</p>
+          </div>
         </div>
       </div>
 

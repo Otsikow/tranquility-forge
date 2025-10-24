@@ -16,7 +16,7 @@ import {
   Lock
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { ForumPost, ForumReply, UsersProfile } from "@/types/db";
+import type { ForumPost, ForumReply, UsersProfile } from "@/types/db";
 import { BottomNav } from "@/components/BottomNav";
 
 export default function ForumPost() {

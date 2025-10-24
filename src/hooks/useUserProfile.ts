@@ -11,7 +11,7 @@ import type {
   UserAchievement,
   UserActivityLog,
   ContentRecommendation,
-  UpdateUserProfile,
+  UpdateUsersProfile,
   InsertUserPreferences,
   InsertUserActivityLog,
   InsertContentRecommendation
@@ -82,7 +82,7 @@ export function useUserProfile() {
   }, []);
 
   // Update profile
-  const updateProfile = useCallback(async (updates: UpdateUserProfile) => {
+  const updateProfile = useCallback(async (updates: UpdateUsersProfile) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');

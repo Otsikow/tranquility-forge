@@ -14,6 +14,232 @@ export type Database = {
   }
   public: {
     Tables: {
+      assessment_progress: {
+        Row: {
+          answers: Json
+          assessment_type: string
+          current_question: number
+          id: string
+          started_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          assessment_type: string
+          current_question?: number
+          id?: string
+          started_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          assessment_type?: string
+          current_question?: number
+          id?: string
+          started_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      assessment_results: {
+        Row: {
+          assessment_type: string
+          completed_at: string
+          created_at: string
+          id: string
+          interpretation: string | null
+          recommendations: string[] | null
+          resources: string[] | null
+          responses: Json
+          score: number
+          severity: string
+          user_id: string
+        }
+        Insert: {
+          assessment_type: string
+          completed_at?: string
+          created_at?: string
+          id?: string
+          interpretation?: string | null
+          recommendations?: string[] | null
+          resources?: string[] | null
+          responses?: Json
+          score: number
+          severity: string
+          user_id: string
+        }
+        Update: {
+          assessment_type?: string
+          completed_at?: string
+          created_at?: string
+          id?: string
+          interpretation?: string | null
+          recommendations?: string[] | null
+          resources?: string[] | null
+          responses?: Json
+          score?: number
+          severity?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      assessments: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          duration_minutes: number | null
+          id: string
+          is_active: boolean | null
+          max_score: number
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          max_score: number
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          max_score?: number
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cbt_categories: {
+        Row: {
+          color: string
+          created_at: string
+          description: string | null
+          icon: string
+          id: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          color: string
+          created_at?: string
+          description?: string | null
+          icon: string
+          id?: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      cbt_exercises: {
+        Row: {
+          category_id: string
+          created_at: string
+          description: string | null
+          difficulty_level: number | null
+          estimated_duration: number | null
+          exercise_type: string
+          id: string
+          instructions: string
+          is_premium: boolean | null
+          title: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          description?: string | null
+          difficulty_level?: number | null
+          estimated_duration?: number | null
+          exercise_type: string
+          id?: string
+          instructions: string
+          is_premium?: boolean | null
+          title: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          description?: string | null
+          difficulty_level?: number | null
+          estimated_duration?: number | null
+          exercise_type?: string
+          id?: string
+          instructions?: string
+          is_premium?: boolean | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cbt_exercises_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "cbt_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cbt_progress: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          exercise_id: string
+          id: string
+          notes: string | null
+          responses: Json | null
+          score: number | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          exercise_id: string
+          id?: string
+          notes?: string | null
+          responses?: Json | null
+          score?: number | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          exercise_id?: string
+          id?: string
+          notes?: string | null
+          responses?: Json | null
+          score?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cbt_progress_exercise_id_fkey"
+            columns: ["exercise_id"]
+            isOneToOne: false
+            referencedRelation: "cbt_exercises"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       content_recommendations: {
         Row: {
           content_id: string
@@ -85,6 +311,143 @@ export type Database = {
           },
         ]
       }
+      forum_categories: {
+        Row: {
+          color: string
+          created_at: string
+          description: string | null
+          icon: string
+          id: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          color: string
+          created_at?: string
+          description?: string | null
+          icon: string
+          id?: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      forum_posts: {
+        Row: {
+          category_id: string
+          content: string
+          created_at: string
+          id: string
+          is_locked: boolean | null
+          is_pinned: boolean | null
+          last_reply_at: string | null
+          likes: number | null
+          replies_count: number | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+          views: number | null
+        }
+        Insert: {
+          category_id: string
+          content: string
+          created_at?: string
+          id?: string
+          is_locked?: boolean | null
+          is_pinned?: boolean | null
+          last_reply_at?: string | null
+          likes?: number | null
+          replies_count?: number | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          user_id: string
+          views?: number | null
+        }
+        Update: {
+          category_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_locked?: boolean | null
+          is_pinned?: boolean | null
+          last_reply_at?: string | null
+          likes?: number | null
+          replies_count?: number | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          views?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_posts_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "forum_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forum_replies: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          likes: number | null
+          parent_reply_id: string | null
+          post_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          likes?: number | null
+          parent_reply_id?: string | null
+          post_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          likes?: number | null
+          parent_reply_id?: string | null
+          post_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_replies_parent_reply_id_fkey"
+            columns: ["parent_reply_id"]
+            isOneToOne: false
+            referencedRelation: "forum_replies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "forum_replies_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "forum_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       journal_entries: {
         Row: {
           content: string | null
@@ -145,6 +508,30 @@ export type Database = {
           id?: string
           is_free?: boolean | null
           title?: string
+        }
+        Relationships: []
+      }
+      premium_features: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          tier_required: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          tier_required: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          tier_required?: string
         }
         Relationships: []
       }
@@ -212,6 +599,123 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      sleep_stories: {
+        Row: {
+          background_sound_url: string | null
+          content: string
+          cover_url: string | null
+          created_at: string
+          description: string | null
+          duration_seconds: number
+          id: string
+          is_premium: boolean | null
+          narrator: string | null
+          title: string
+        }
+        Insert: {
+          background_sound_url?: string | null
+          content: string
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          duration_seconds: number
+          id?: string
+          is_premium?: boolean | null
+          narrator?: string | null
+          title: string
+        }
+        Update: {
+          background_sound_url?: string | null
+          content?: string
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number
+          id?: string
+          is_premium?: boolean | null
+          narrator?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      sleep_tracking: {
+        Row: {
+          bedtime: string | null
+          created_at: string
+          id: string
+          mood_after_sleep: number | null
+          mood_before_sleep: number | null
+          notes: string | null
+          sleep_date: string
+          sleep_duration: number | null
+          sleep_quality: number | null
+          user_id: string
+          wake_time: string | null
+        }
+        Insert: {
+          bedtime?: string | null
+          created_at?: string
+          id?: string
+          mood_after_sleep?: number | null
+          mood_before_sleep?: number | null
+          notes?: string | null
+          sleep_date: string
+          sleep_duration?: number | null
+          sleep_quality?: number | null
+          user_id: string
+          wake_time?: string | null
+        }
+        Update: {
+          bedtime?: string | null
+          created_at?: string
+          id?: string
+          mood_after_sleep?: number | null
+          mood_before_sleep?: number | null
+          notes?: string | null
+          sleep_date?: string
+          sleep_duration?: number | null
+          sleep_quality?: number | null
+          user_id?: string
+          wake_time?: string | null
+        }
+        Relationships: []
+      }
+      soundscapes: {
+        Row: {
+          audio_url: string
+          category: string
+          cover_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_loopable: boolean | null
+          is_premium: boolean | null
+          name: string
+        }
+        Insert: {
+          audio_url: string
+          category: string
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_loopable?: boolean | null
+          is_premium?: boolean | null
+          name: string
+        }
+        Update: {
+          audio_url?: string
+          category?: string
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_loopable?: boolean | null
+          is_premium?: boolean | null
+          name?: string
+        }
+        Relationships: []
       }
       sync_queue: {
         Row: {
@@ -303,6 +807,38 @@ export type Database = {
         }
         Relationships: []
       }
+      user_feature_access: {
+        Row: {
+          expires_at: string | null
+          feature_id: string
+          granted_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          expires_at?: string | null
+          feature_id: string
+          granted_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          expires_at?: string | null
+          feature_id?: string
+          granted_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_feature_access_feature_id_fkey"
+            columns: ["feature_id"]
+            isOneToOne: false
+            referencedRelation: "premium_features"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_preferences: {
         Row: {
           community_participation_enabled: boolean | null
@@ -362,6 +898,42 @@ export type Database = {
           created_at?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_subscriptions: {
+        Row: {
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          status: string
+          stripe_subscription_id: string | null
+          tier: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          status: string
+          stripe_subscription_id?: string | null
+          tier: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          status?: string
+          stripe_subscription_id?: string | null
+          tier?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -466,6 +1038,40 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      complete_assessment: {
+        Args: {
+          p_assessment_type: string
+          p_interpretation: string
+          p_recommendations: string[]
+          p_resources: string[]
+          p_responses: Json
+          p_score: number
+          p_severity: string
+          p_user_id: string
+        }
+        Returns: string
+      }
+      get_assessment_history: {
+        Args: { p_assessment_type: string; p_user_id: string }
+        Returns: {
+          completed_at: string
+          id: string
+          interpretation: string
+          recommendations: string[]
+          resources: string[]
+          score: number
+          severity: string
+        }[]
+      }
+      get_assessment_progress: {
+        Args: { p_assessment_type: string; p_user_id: string }
+        Returns: {
+          answers: Json
+          current_question: number
+          id: string
+          started_at: string
+        }[]
+      }
       get_user_download_size: { Args: { p_user_id: string }; Returns: number }
       has_role: {
         Args: {
@@ -480,6 +1086,15 @@ export type Database = {
           p_activity_type: string
           p_duration_seconds?: number
           p_metadata?: Json
+          p_user_id: string
+        }
+        Returns: string
+      }
+      save_assessment_progress: {
+        Args: {
+          p_answers: Json
+          p_assessment_type: string
+          p_current_question: number
           p_user_id: string
         }
         Returns: string

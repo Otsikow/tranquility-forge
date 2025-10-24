@@ -20,6 +20,7 @@ import ResetPassword from "./pages/auth/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 
 // Lazy load for optimization
+const Wellness = lazy(() => import("./pages/Wellness"));
 const Chat = lazy(() => import("./pages/EnhancedChat"));
 const Moods = lazy(() => import("./pages/Moods"));
 const Journal = lazy(() => import("./pages/Journal"));
@@ -48,6 +49,7 @@ const Notifications = lazy(() => import("./pages/settings/Notifications"));
 const Help = lazy(() => import("./pages/settings/Help"));
 const About = lazy(() => import("./pages/settings/About"));
 const Legal = lazy(() => import("./pages/settings/Legal"));
+const HealthSupport = lazy(() => import("./pages/HealthSupport"));
 const Admin = lazy(() => import("./pages/Admin"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -84,6 +86,7 @@ const App = () => {
                 <Route path="/dashboard" element={<Dashboard />} />
 
                 {/* Main Features */}
+                <Route path="/wellness" element={<Wellness />} />
                 <Route path="/chat" element={<Chat />} />
                 <Route path="/moods" element={<Moods />} />
                 <Route path="/journal" element={<Journal />} />
@@ -111,6 +114,7 @@ const App = () => {
                 <Route path="/settings/help" element={<Help />} />
                 <Route path="/settings/about" element={<About />} />
                 <Route path="/settings/legal" element={<Legal />} />
+                <Route path="/health-support" element={<HealthSupport />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

@@ -141,7 +141,7 @@ export default function Assessments() {
     const results = Object.values(assessmentResults);
     if (results.length === 0) return;
 
-    const csvContent = exportAssessmentResults(results);
+    const csvContent = exportAssessmentResults(results as any);
     const blob = new Blob([csvContent], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -155,7 +155,7 @@ export default function Assessments() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <AppBar title="Mental Health Assessments" showBack={false} />
+      <AppBar title="Mental Health Assessments" showBack backTo="/dashboard" />
 
       <div className="px-6 py-6 space-y-6">
         {/* Header */}
@@ -510,6 +510,7 @@ export default function Assessments() {
             <AssessmentDetailedResults
               assessmentType={detailedResultsAssessment}
               result={assessmentResults[detailedResultsAssessment]}
+              onClose={() => setDetailedResultsAssessment(null)}
             />
           )}
         </DialogContent>

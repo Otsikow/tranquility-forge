@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,13 +14,18 @@ import {
   Heart,
   MessageSquare,
   Eye,
-  Pin
+  Pin,
+  Brain,
+  ClipboardList,
+  ArrowRight,
+  ArrowLeft
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ForumCategory, ForumPost, UsersProfile } from "@/types/db";
 import { BottomNav } from "@/components/BottomNav";
 
 export default function Community() {
+  const navigate = useNavigate();
   const [categories, setCategories] = useState<ForumCategory[]>([]);
   const [recentPosts, setRecentPosts] = useState<ForumPost[]>([]);
   const [trendingPosts, setTrendingPosts] = useState<ForumPost[]>([]);
@@ -109,9 +114,16 @@ export default function Community() {
       {/* Header */}
       <div className="bg-card border-b border-border px-6 py-4">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Community</h1>
-            <p className="text-muted-foreground">Connect with others on their wellness journey</p>
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/dashboard">
+                <ArrowLeft className="h-4 w-4" />
+              </Link>
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Community</h1>
+              <p className="text-muted-foreground">Connect with others on their wellness journey</p>
+            </div>
           </div>
           <Button asChild>
             <Link to="/community/new-post">
@@ -133,6 +145,44 @@ export default function Community() {
             className="pl-10"
           />
         </div>
+
+        {/* Quick Links */}
+        <Card className="bg-muted/50">
+          <CardContent className="pt-6">
+            <h3 className="text-lg font-semibold text-foreground mb-4">Tools & Resources</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <Button
+                variant="ghost"
+                className="h-16 justify-start gap-3"
+                onClick={() => navigate("/cbt")}
+              >
+                <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center">
+                  <Brain className="h-5 w-5 text-white" />
+                </div>
+                <div className="text-left">
+                  <div className="font-medium">CBT Tools</div>
+                  <div className="text-sm text-muted-foreground">Cognitive behavioral therapy</div>
+                </div>
+                <ArrowRight className="h-4 w-4 ml-auto" />
+              </Button>
+              
+              <Button
+                variant="ghost"
+                className="h-16 justify-start gap-3"
+                onClick={() => navigate("/assessments")}
+              >
+                <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center">
+                  <ClipboardList className="h-5 w-5 text-white" />
+                </div>
+                <div className="text-left">
+                  <div className="font-medium">Assessments</div>
+                  <div className="text-sm text-muted-foreground">Mental health check-ins</div>
+                </div>
+                <ArrowRight className="h-4 w-4 ml-auto" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         <Tabs defaultValue="categories" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
