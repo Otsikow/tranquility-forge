@@ -54,7 +54,7 @@ export default function Index() {
         </div>
         
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-          <img src={logoImage} alt="Peace Logo" className="h-24 w-24 mb-4 drop-shadow-xl animate-fade-up" />
+          <img src={logoImage} alt="Peace Logo" className="h-48 w-48 mb-4 drop-shadow-xl animate-fade-up" />
           <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-6 animate-fade-up" style={{
           animationDelay: '0.1s'
         }}>
