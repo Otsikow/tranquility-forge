@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Leaf, Heart, BookOpen, MessageCircle, Wind, Sparkles } from "lucide-react";
+import { Leaf, Heart, BookOpen, MessageCircle, Wind, Sparkles, Music, Users, Brain, Moon, ClipboardList } from "lucide-react";
 import { Footer } from "@/components/Footer";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import logoImage from "@/assets/logo.png";
@@ -42,6 +42,18 @@ const features = [{
   description: "Start each day with positive, uplifting messages",
   image: eagleImage
 }];
+
+const quickLinks = [
+  { icon: BookOpen, label: "Journal", to: "/journal" },
+  { icon: Music, label: "Meditations", to: "/meditations" },
+  { icon: MessageCircle, label: "Chat", to: "/chat" },
+  { icon: Users, label: "Community", to: "/community" },
+  { icon: Brain, label: "CBT Tools", to: "/cbt" },
+  { icon: Moon, label: "Sleep", to: "/sleep" },
+  { icon: ClipboardList, label: "Assessments", to: "/assessments" },
+  { icon: Wind, label: "Breathe", to: "/breathe" },
+  { icon: Sparkles, label: "Affirmations", to: "/affirmations" },
+];
 export default function Index() {
   return <div className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -117,6 +129,34 @@ export default function Index() {
                 </CardContent>
               </Card>;
         })}
+        </div>
+      </section>
+
+      {/* Quick Links */}
+      <section className="py-12 px-6 max-w-7xl mx-auto">
+        <div className="mb-8">
+          <h3 className="text-2xl md:text-3xl font-bold text-foreground">
+            Quick Links
+          </h3>
+          <p className="text-muted-foreground mt-2">
+            Jump straight into key experiences
+          </p>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          {quickLinks.map(({ icon: Icon, label, to }) => (
+            <Link key={to} to={to} className="group">
+              <Card className="hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5">
+                <CardContent className="pt-4 pb-4 flex flex-col items-center justify-center gap-2">
+                  <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div className="text-sm font-medium text-foreground text-center">
+                    {label}
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
         </div>
       </section>
 
