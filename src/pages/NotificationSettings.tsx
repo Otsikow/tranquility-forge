@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -14,7 +15,8 @@ import {
   Wind,
   MessageCircle,
   CheckCircle,
-  XCircle
+  XCircle,
+  ArrowLeft
 } from "lucide-react";
 import { notificationService } from "@/lib/notificationService";
 import { supabase } from "@/integrations/supabase/client";
@@ -167,9 +169,16 @@ export default function NotificationSettings() {
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
       <div className="bg-card border-b border-border px-6 py-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Notification Settings</h1>
-          <p className="text-muted-foreground">Manage your notification preferences</p>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/settings">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Notification Settings</h1>
+            <p className="text-muted-foreground">Manage your notification preferences</p>
+          </div>
         </div>
       </div>
 

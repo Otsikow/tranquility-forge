@@ -101,7 +101,7 @@ export default function Wellness() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <AppBar title="Wellness" showBack={false} />
+      <AppBar title="Wellness" showBack backTo="/dashboard" />
       
       {/* Hero Section */}
       <div className="relative h-48 overflow-hidden">

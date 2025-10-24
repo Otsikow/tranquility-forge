@@ -97,7 +97,7 @@ export default function Chat() {
 
   return (
     <div className="min-h-screen bg-card flex flex-col pb-20">
-      <AppBar title="Peace" />
+      <AppBar title="Peace" showBack backTo="/dashboard" />
 
       {/* Crisis Banner */}
       {showCrisisBanner && (
