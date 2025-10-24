@@ -49,6 +49,7 @@ const Notifications = lazy(() => import("./pages/settings/Notifications"));
 const Help = lazy(() => import("./pages/settings/Help"));
 const About = lazy(() => import("./pages/settings/About"));
 const Legal = lazy(() => import("./pages/settings/Legal"));
+const HealthSupport = lazy(() => import("./pages/HealthSupport"));
 const Admin = lazy(() => import("./pages/Admin"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -113,6 +114,7 @@ const App = () => {
                 <Route path="/settings/help" element={<Help />} />
                 <Route path="/settings/about" element={<About />} />
                 <Route path="/settings/legal" element={<Legal />} />
+                <Route path="/health-support" element={<HealthSupport />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
