@@ -18,9 +18,12 @@ import {
   ArrowRight,
   ArrowLeft,
   Target,
-  TrendingUp
+  TrendingUp,
+  Loader2
 } from "lucide-react";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { useAssessments } from "@/hooks/useAssessments";
+import { useToast } from "@/hooks/use-toast";
 
 interface AssessmentQuestion {
   id: string;
@@ -206,6 +209,232 @@ const GAD7Questions: AssessmentQuestion[] = [
   }
 ];
 
+const PSS10Questions: AssessmentQuestion[] = [
+  {
+    id: "upset",
+    text: "In the last month, how often have you been upset because of something that happened unexpectedly?",
+    options: [
+      { value: 0, label: "Never" },
+      { value: 1, label: "Almost never" },
+      { value: 2, label: "Sometimes" },
+      { value: 3, label: "Fairly often" },
+      { value: 4, label: "Very often" }
+    ]
+  },
+  {
+    id: "unable_control",
+    text: "In the last month, how often have you felt that you were unable to control the important things in your life?",
+    options: [
+      { value: 0, label: "Never" },
+      { value: 1, label: "Almost never" },
+      { value: 2, label: "Sometimes" },
+      { value: 3, label: "Fairly often" },
+      { value: 4, label: "Very often" }
+    ]
+  },
+  {
+    id: "nervous_stressed",
+    text: "In the last month, how often have you felt nervous and stressed?",
+    options: [
+      { value: 0, label: "Never" },
+      { value: 1, label: "Almost never" },
+      { value: 2, label: "Sometimes" },
+      { value: 3, label: "Fairly often" },
+      { value: 4, label: "Very often" }
+    ]
+  },
+  {
+    id: "confident",
+    text: "In the last month, how often have you felt confident about your ability to handle your personal problems?",
+    options: [
+      { value: 4, label: "Never" },
+      { value: 3, label: "Almost never" },
+      { value: 2, label: "Sometimes" },
+      { value: 1, label: "Fairly often" },
+      { value: 0, label: "Very often" }
+    ]
+  },
+  {
+    id: "going_your_way",
+    text: "In the last month, how often have you felt that things were going your way?",
+    options: [
+      { value: 4, label: "Never" },
+      { value: 3, label: "Almost never" },
+      { value: 2, label: "Sometimes" },
+      { value: 1, label: "Fairly often" },
+      { value: 0, label: "Very often" }
+    ]
+  },
+  {
+    id: "could_not_cope",
+    text: "In the last month, how often have you found that you could not cope with all the things that you had to do?",
+    options: [
+      { value: 0, label: "Never" },
+      { value: 1, label: "Almost never" },
+      { value: 2, label: "Sometimes" },
+      { value: 3, label: "Fairly often" },
+      { value: 4, label: "Very often" }
+    ]
+  },
+  {
+    id: "control_irritations",
+    text: "In the last month, how often have you been able to control irritations in your life?",
+    options: [
+      { value: 4, label: "Never" },
+      { value: 3, label: "Almost never" },
+      { value: 2, label: "Sometimes" },
+      { value: 1, label: "Fairly often" },
+      { value: 0, label: "Very often" }
+    ]
+  },
+  {
+    id: "on_top",
+    text: "In the last month, how often have you felt that you were on top of things?",
+    options: [
+      { value: 4, label: "Never" },
+      { value: 3, label: "Almost never" },
+      { value: 2, label: "Sometimes" },
+      { value: 1, label: "Fairly often" },
+      { value: 0, label: "Very often" }
+    ]
+  },
+  {
+    id: "angered",
+    text: "In the last month, how often have you been angered because of things that happened that were outside of your control?",
+    options: [
+      { value: 0, label: "Never" },
+      { value: 1, label: "Almost never" },
+      { value: 2, label: "Sometimes" },
+      { value: 3, label: "Fairly often" },
+      { value: 4, label: "Very often" }
+    ]
+  },
+  {
+    id: "difficulties_piling",
+    text: "In the last month, how often have you felt difficulties were piling up so high that you could not overcome them?",
+    options: [
+      { value: 0, label: "Never" },
+      { value: 1, label: "Almost never" },
+      { value: 2, label: "Sometimes" },
+      { value: 3, label: "Fairly often" },
+      { value: 4, label: "Very often" }
+    ]
+  }
+];
+
+const SleepHygieneQuestions: AssessmentQuestion[] = [
+  {
+    id: "consistent_schedule",
+    text: "I go to bed and wake up at approximately the same time each day",
+    options: [
+      { value: 4, label: "Always (7 days/week)" },
+      { value: 3, label: "Usually (5-6 days/week)" },
+      { value: 2, label: "Sometimes (3-4 days/week)" },
+      { value: 1, label: "Rarely (1-2 days/week)" },
+      { value: 0, label: "Never" }
+    ]
+  },
+  {
+    id: "sleep_duration",
+    text: "I get 7-9 hours of sleep per night",
+    options: [
+      { value: 4, label: "Always (7 days/week)" },
+      { value: 3, label: "Usually (5-6 days/week)" },
+      { value: 2, label: "Sometimes (3-4 days/week)" },
+      { value: 1, label: "Rarely (1-2 days/week)" },
+      { value: 0, label: "Never" }
+    ]
+  },
+  {
+    id: "caffeine_timing",
+    text: "I avoid caffeine within 6 hours of bedtime",
+    options: [
+      { value: 4, label: "Always" },
+      { value: 3, label: "Usually" },
+      { value: 2, label: "Sometimes" },
+      { value: 1, label: "Rarely" },
+      { value: 0, label: "Never" }
+    ]
+  },
+  {
+    id: "screen_time",
+    text: "I avoid screens (phone, TV, computer) for at least 30 minutes before bed",
+    options: [
+      { value: 4, label: "Always" },
+      { value: 3, label: "Usually" },
+      { value: 2, label: "Sometimes" },
+      { value: 1, label: "Rarely" },
+      { value: 0, label: "Never" }
+    ]
+  },
+  {
+    id: "bedroom_environment",
+    text: "My bedroom is dark, quiet, and cool",
+    options: [
+      { value: 4, label: "Always" },
+      { value: 3, label: "Usually" },
+      { value: 2, label: "Sometimes" },
+      { value: 1, label: "Rarely" },
+      { value: 0, label: "Never" }
+    ]
+  },
+  {
+    id: "bed_for_sleep",
+    text: "I use my bed only for sleep (not work, watching TV, etc.)",
+    options: [
+      { value: 4, label: "Always" },
+      { value: 3, label: "Usually" },
+      { value: 2, label: "Sometimes" },
+      { value: 1, label: "Rarely" },
+      { value: 0, label: "Never" }
+    ]
+  },
+  {
+    id: "exercise_timing",
+    text: "I avoid vigorous exercise within 3 hours of bedtime",
+    options: [
+      { value: 4, label: "Always" },
+      { value: 3, label: "Usually" },
+      { value: 2, label: "Sometimes" },
+      { value: 1, label: "Rarely" },
+      { value: 0, label: "Never" }
+    ]
+  },
+  {
+    id: "relaxation_routine",
+    text: "I have a relaxing bedtime routine",
+    options: [
+      { value: 4, label: "Always" },
+      { value: 3, label: "Usually" },
+      { value: 2, label: "Sometimes" },
+      { value: 1, label: "Rarely" },
+      { value: 0, label: "Never" }
+    ]
+  },
+  {
+    id: "alcohol_avoidance",
+    text: "I avoid alcohol close to bedtime",
+    options: [
+      { value: 4, label: "Always" },
+      { value: 3, label: "Usually" },
+      { value: 2, label: "Sometimes" },
+      { value: 1, label: "Rarely" },
+      { value: 0, label: "Never" }
+    ]
+  },
+  {
+    id: "daytime_naps",
+    text: "I avoid long daytime naps (more than 30 minutes)",
+    options: [
+      { value: 4, label: "Always" },
+      { value: 3, label: "Usually" },
+      { value: 2, label: "Sometimes" },
+      { value: 1, label: "Rarely" },
+      { value: 0, label: "Never" }
+    ]
+  }
+];
+
 const assessments = {
   phq9: {
     name: "PHQ-9 Depression Screening",
@@ -222,6 +451,22 @@ const assessments = {
     color: "text-purple-500",
     questions: GAD7Questions,
     maxScore: 21
+  },
+  pss10: {
+    name: "PSS-10 Stress Scale",
+    description: "A 10-question scale to measure perceived stress",
+    icon: Target,
+    color: "text-orange-500",
+    questions: PSS10Questions,
+    maxScore: 40
+  },
+  sleep_hygiene: {
+    name: "Sleep Hygiene Assessment",
+    description: "Evaluate your sleep habits and quality",
+    icon: Moon,
+    color: "text-indigo-500",
+    questions: SleepHygieneQuestions,
+    maxScore: 40
   }
 };
 
@@ -233,10 +478,13 @@ interface SelfAssessmentProps {
 
 export default function SelfAssessment({ assessmentType, onComplete, onClose }: SelfAssessmentProps) {
   const { logActivity } = useUserProfile();
+  const { saveAssessmentResult, loading } = useAssessments();
+  const { toast } = useToast();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [isCompleted, setIsCompleted] = useState(false);
   const [result, setResult] = useState<AssessmentResult | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const assessment = assessments[assessmentType];
   const progress = ((currentQuestion + 1) / assessment.questions.length) * 100;
@@ -314,7 +562,7 @@ export default function SelfAssessment({ assessmentType, onComplete, onClose }: 
         ];
         resources = ["Crisis support", "Emergency resources", "Professional support"];
       }
-    } else { // GAD7
+    } else if (assessmentType === 'gad7') {
       if (totalScore <= 4) {
         level = 'minimal';
         interpretation = "Your responses suggest minimal anxiety symptoms.";
@@ -352,6 +600,77 @@ export default function SelfAssessment({ assessmentType, onComplete, onClose }: 
         ];
         resources = ["Professional support", "Crisis support", "Anxiety management"];
       }
+    } else if (assessmentType === 'pss10') {
+      if (totalScore <= 13) {
+        level = 'minimal';
+        interpretation = "You are experiencing low perceived stress.";
+        recommendations = [
+          "Continue your current stress management practices",
+          "Maintain work-life balance",
+          "Practice preventive self-care"
+        ];
+        resources = ["Stress management", "Meditation", "Exercise"];
+      } else if (totalScore <= 26) {
+        level = 'moderate';
+        interpretation = "You are experiencing moderate perceived stress.";
+        recommendations = [
+          "Identify and manage stress triggers",
+          "Practice relaxation techniques daily",
+          "Consider stress management workshops",
+          "Ensure adequate sleep and exercise"
+        ];
+        resources = ["Breathing exercises", "Meditation", "Time management", "Professional support"];
+      } else {
+        level = 'severe';
+        interpretation = "You are experiencing high perceived stress.";
+        recommendations = [
+          "Seek professional support for stress management",
+          "Review and adjust daily commitments",
+          "Practice intensive self-care",
+          "Consider therapy or counseling"
+        ];
+        resources = ["Professional support", "Stress management", "Therapy resources"];
+      }
+    } else { // sleep_hygiene
+      if (totalScore >= 32) {
+        level = 'minimal';
+        interpretation = "You have excellent sleep hygiene practices.";
+        recommendations = [
+          "Continue your healthy sleep habits",
+          "Share your sleep routine with others",
+          "Monitor for any changes in sleep quality"
+        ];
+        resources = ["Sleep tracking", "Sleep meditation"];
+      } else if (totalScore >= 24) {
+        level = 'mild';
+        interpretation = "Your sleep hygiene is good but has room for improvement.";
+        recommendations = [
+          "Review areas where you scored lower",
+          "Implement one new sleep habit at a time",
+          "Track your sleep quality improvements"
+        ];
+        resources = ["Sleep hygiene guide", "Sleep tracking", "Relaxation techniques"];
+      } else if (totalScore >= 16) {
+        level = 'moderate';
+        interpretation = "Your sleep hygiene needs significant improvement.";
+        recommendations = [
+          "Create a consistent bedtime routine",
+          "Optimize your bedroom environment",
+          "Address screen time and caffeine habits",
+          "Consider sleep education resources"
+        ];
+        resources = ["Sleep hygiene guide", "Professional support", "Sleep meditation"];
+      } else {
+        level = 'severe';
+        interpretation = "Your sleep hygiene needs major attention.";
+        recommendations = [
+          "Consult a healthcare provider about sleep issues",
+          "Start with one sleep habit change at a time",
+          "Consider a sleep study if problems persist",
+          "Address lifestyle factors affecting sleep"
+        ];
+        resources = ["Professional support", "Sleep specialist", "Sleep hygiene guide"];
+      }
     }
 
     const assessmentResult: AssessmentResult = {
@@ -365,14 +684,55 @@ export default function SelfAssessment({ assessmentType, onComplete, onClose }: 
     setResult(assessmentResult);
     setIsCompleted(true);
 
-    // Log activity
-    logActivity('assessment', undefined, undefined, {
-      assessment_type: assessmentType,
-      score: totalScore,
-      level: level
-    });
+    // Save to database
+    saveResultToDatabase(assessmentResult);
+  };
 
-    onComplete?.(assessmentResult);
+  const saveResultToDatabase = async (assessmentResult: AssessmentResult) => {
+    setIsSaving(true);
+    try {
+      const savedResult = await saveAssessmentResult(
+        assessmentType,
+        assessmentResult.score,
+        assessment.maxScore,
+        assessmentResult.level,
+        assessmentResult.interpretation,
+        assessmentResult.recommendations,
+        assessmentResult.resources,
+        answers
+      );
+
+      if (savedResult) {
+        // Log activity
+        logActivity('assessment', savedResult.id, undefined, {
+          assessment_type: assessmentType,
+          score: assessmentResult.score,
+          level: assessmentResult.level
+        });
+
+        toast({
+          title: "Assessment Complete",
+          description: "Your results have been saved successfully.",
+        });
+
+        onComplete?.(assessmentResult);
+      } else {
+        toast({
+          title: "Warning",
+          description: "Assessment completed but results could not be saved.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Error saving assessment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save assessment results.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const resetAssessment = () => {
@@ -460,12 +820,20 @@ export default function SelfAssessment({ assessmentType, onComplete, onClose }: 
             </div>
           </div>
 
+          {/* Saving Indicator */}
+          {isSaving && (
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Saving results...
+            </div>
+          )}
+
           {/* Actions */}
           <div className="flex gap-3 pt-4">
-            <Button variant="outline" onClick={resetAssessment} className="flex-1">
+            <Button variant="outline" onClick={resetAssessment} className="flex-1" disabled={isSaving}>
               Retake Assessment
             </Button>
-            <Button onClick={onClose} className="flex-1">
+            <Button onClick={onClose} className="flex-1" disabled={isSaving}>
               Close
             </Button>
           </div>

@@ -348,6 +348,46 @@ export interface ContentRecommendation {
 }
 
 /* -------------------------------------------------------------
+   Assessment Results
+-------------------------------------------------------------- */
+
+export type AssessmentType = 'phq9' | 'gad7' | 'pss10' | 'sleep_hygiene';
+export type SeverityLevel = 'minimal' | 'mild' | 'moderate' | 'moderately_severe' | 'severe';
+
+export interface AssessmentResult {
+  id: string;
+  user_id: string;
+  assessment_type: AssessmentType;
+  score: number;
+  max_score: number;
+  severity_level: SeverityLevel;
+  interpretation: string;
+  recommendations: string[];
+  resources: string[];
+  answers: Record<string, number>;
+  completed_at: string;
+  created_at: string;
+}
+
+export interface AssessmentHistory {
+  id: string;
+  assessment_type: AssessmentType;
+  score: number;
+  max_score: number;
+  severity_level: SeverityLevel;
+  completed_at: string;
+}
+
+export interface AssessmentStats {
+  total_count: number;
+  avg_score: number;
+  min_score: number;
+  max_score: number;
+  latest_score: number;
+  trend: 'improving' | 'stable' | 'worsening' | 'insufficient_data';
+}
+
+/* -------------------------------------------------------------
    Insert and Update Types for Advanced Tables
 -------------------------------------------------------------- */
 
@@ -373,4 +413,9 @@ export type UpdateUserActivityLog = Partial<
 >;
 export type UpdateContentRecommendation = Partial<
   Omit<ContentRecommendation, "id" | "user_id" | "created_at">
+>;
+
+export type InsertAssessmentResult = Omit<AssessmentResult, "id" | "created_at">;
+export type UpdateAssessmentResult = Partial<
+  Omit<AssessmentResult, "id" | "user_id" | "created_at">
 >;
