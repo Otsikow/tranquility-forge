@@ -1,7 +1,6 @@
 import { AppBar } from "@/components/AppBar";
 import { BottomNav } from "@/components/BottomNav";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { 
   MessageCircle, 
   Mail, 
@@ -10,6 +9,9 @@ import {
   ExternalLink,
   ChevronRight
 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { buttonVariants } from "@/components/ui/button";
+import { CRISIS_RESOURCES, SAFETY_TIPS } from "@/lib/safety";
 
 const helpResources = [
   {
@@ -17,24 +19,32 @@ const helpResources = [
     description: "Find quick answers to common questions",
     icon: BookOpen,
     action: "View FAQs",
+    type: "anchor",
+    href: "#faq",
   },
   {
     title: "Video Tutorials",
     description: "Watch guides on how to use Peace",
     icon: Video,
     action: "Watch Videos",
+    type: "external",
+    href: "https://www.youtube.com/results?search_query=peace+app+mindfulness",
   },
   {
     title: "Contact Support",
     description: "Get help from our support team",
     icon: Mail,
     action: "Send Message",
+    type: "mailto",
+    href: "mailto:support@peace.app",
   },
   {
     title: "Live Chat",
     description: "Chat with us in real-time",
     icon: MessageCircle,
     action: "Start Chat",
+    type: "internal",
+    to: "/chat",
   },
 ];
 
@@ -73,7 +83,7 @@ export default function Help() {
             return (
               <Card 
                 key={index} 
-                className="hover:shadow-lg transition-all duration-200 cursor-pointer hover:-translate-y-0.5"
+                className="hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5"
               >
                 <CardContent className="p-4">
                   <div className="flex items-center gap-4">
@@ -88,9 +98,40 @@ export default function Help() {
                         {resource.description}
                       </p>
                     </div>
-                    <Button variant="ghost" size="sm">
-                      {resource.action}
-                    </Button>
+                    {resource.type === 'internal' && resource.to && (
+                      <Link
+                        to={resource.to}
+                        className={buttonVariants({ variant: 'ghost', size: 'sm' })}
+                      >
+                        {resource.action}
+                      </Link>
+                    )}
+                    {resource.type === 'anchor' && resource.href && (
+                      <a
+                        href={resource.href}
+                        className={buttonVariants({ variant: 'ghost', size: 'sm' })}
+                      >
+                        {resource.action}
+                      </a>
+                    )}
+                    {resource.type === 'external' && resource.href && (
+                      <a
+                        href={resource.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={buttonVariants({ variant: 'ghost', size: 'sm' })}
+                      >
+                        {resource.action}
+                      </a>
+                    )}
+                    {resource.type === 'mailto' && resource.href && (
+                      <a
+                        href={resource.href}
+                        className={buttonVariants({ variant: 'ghost', size: 'sm' })}
+                      >
+                        {resource.action}
+                      </a>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -98,8 +139,43 @@ export default function Help() {
           })}
         </div>
 
-        {/* Quick FAQs */}
+        {/* Health & Safety */}
         <Card>
+          <CardContent className="pt-6 space-y-4">
+            <h3 className="text-lg font-semibold text-foreground mb-2">Crisis Support</h3>
+            <p className="text-sm text-muted-foreground">
+              If you're in crisis or having thoughts of self-harm, please reach out immediately:
+            </p>
+            <div className="space-y-2">
+              {CRISIS_RESOURCES.map((resource) => (
+                <a
+                  key={resource.label}
+                  href={resource.url}
+                  className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted transition-colors"
+                >
+                  <div>
+                    <p className="font-medium">{resource.label}</p>
+                    <p className="text-sm text-muted-foreground">{resource.description}</p>
+                  </div>
+                  <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                </a>
+              ))}
+            </div>
+
+            <h3 className="text-lg font-semibold text-foreground mt-6">Wellbeing Tips</h3>
+            <div className="space-y-3">
+              {SAFETY_TIPS.map((tip) => (
+                <div key={tip.title} className="p-4 rounded-lg bg-muted/50">
+                  <h4 className="font-medium mb-1">{tip.title}</h4>
+                  <p className="text-sm text-muted-foreground">{tip.description}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Quick FAQs */}
+        <Card id="faq">
           <CardContent className="pt-6 space-y-4">
             <h3 className="text-lg font-semibold text-foreground mb-4">
               Quick Answers
@@ -176,10 +252,13 @@ export default function Help() {
           <p className="text-sm text-muted-foreground">
             Our support team is available 24/7
           </p>
-          <Button variant="outline" className="gap-2 mt-4">
+          <a
+            href="mailto:support@peace.app"
+            className={buttonVariants({ variant: "outline", size: "default" }) + " gap-2 mt-4 inline-flex"}
+          >
             <Mail className="w-4 h-4" />
             support@peace.app
-          </Button>
+          </a>
         </div>
       </div>
 

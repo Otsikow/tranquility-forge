@@ -43,13 +43,20 @@ const Assessments = lazy(() => import("./pages/Assessments"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Subscription = lazy(() => import("./pages/Subscription"));
-const NotificationSettings = lazy(() => import("./pages/NotificationSettings"));
+// Notifications page (settings)
+// Note: Use the settings/Notifications page, not components/NotificationSettings
+// to render the full page with AppBar and layout.
 const ProfileSecurity = lazy(() => import("./pages/settings/ProfileSecurity"));
 const Notifications = lazy(() => import("./pages/settings/Notifications"));
 const Help = lazy(() => import("./pages/settings/Help"));
 const About = lazy(() => import("./pages/settings/About"));
 const Legal = lazy(() => import("./pages/settings/Legal"));
 const Admin = lazy(() => import("./pages/Admin"));
+// Legal subpages
+const Terms = lazy(() => import("./pages/settings/legal/Terms"));
+const Privacy = lazy(() => import("./pages/settings/legal/Privacy"));
+const Cookies = lazy(() => import("./pages/settings/legal/Cookies"));
+const Guidelines = lazy(() => import("./pages/settings/legal/Guidelines"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -109,10 +116,14 @@ const App = () => {
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/subscription" element={<Subscription />} />
                 <Route path="/settings/profile-security" element={<ProfileSecurity />} />
-                <Route path="/settings/notifications" element={<NotificationSettings />} />
+                <Route path="/settings/notifications" element={<Notifications />} />
                 <Route path="/settings/help" element={<Help />} />
                 <Route path="/settings/about" element={<About />} />
                 <Route path="/settings/legal" element={<Legal />} />
+                <Route path="/settings/legal/terms" element={<Terms />} />
+                <Route path="/settings/legal/privacy" element={<Privacy />} />
+                <Route path="/settings/legal/cookies" element={<Cookies />} />
+                <Route path="/settings/legal/guidelines" element={<Guidelines />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

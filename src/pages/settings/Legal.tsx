@@ -2,6 +2,7 @@ import { AppBar } from "@/components/AppBar";
 import { BottomNav } from "@/components/BottomNav";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronRight, FileText, Shield, Cookie, Scale } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const legalDocuments = [
   {
@@ -9,24 +10,28 @@ const legalDocuments = [
     description: "Read our terms and conditions",
     icon: FileText,
     lastUpdated: "October 20, 2024",
+    path: "/settings/legal/terms",
   },
   {
     title: "Privacy Policy",
     description: "Learn how we protect your data",
     icon: Shield,
     lastUpdated: "October 20, 2024",
+    path: "/settings/legal/privacy",
   },
   {
     title: "Cookie Policy",
     description: "Understand how we use cookies",
     icon: Cookie,
     lastUpdated: "October 20, 2024",
+    path: "/settings/legal/cookies",
   },
   {
     title: "Community Guidelines",
     description: "Our community standards and expectations",
     icon: Scale,
     lastUpdated: "October 20, 2024",
+    path: "/settings/legal/guidelines",
   },
 ];
 
@@ -48,30 +53,31 @@ export default function Legal() {
           {legalDocuments.map((doc, index) => {
             const Icon = doc.icon;
             return (
-              <Card 
-                key={index} 
-                className="hover:shadow-lg transition-all duration-200 cursor-pointer hover:-translate-y-0.5"
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-4">
-                    <div className="bg-primary/10 rounded-full p-3">
-                      <Icon className="w-6 h-6 text-primary" />
+              <Link to={doc.path} key={doc.path}>
+                <Card 
+                  className="hover:shadow-lg transition-all duration-200 cursor-pointer hover:-translate-y-0.5"
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-primary/10 rounded-full p-3">
+                        <Icon className="w-6 h-6 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-foreground mb-1">
+                          {doc.title}
+                        </h3>
+                        <p className="text-sm text-muted-foreground mb-1">
+                          {doc.description}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Last updated: {doc.lastUpdated}
+                        </p>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
                     </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-foreground mb-1">
-                        {doc.title}
-                      </h3>
-                      <p className="text-sm text-muted-foreground mb-1">
-                        {doc.description}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Last updated: {doc.lastUpdated}
-                      </p>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </Link>
             );
           })}
         </div>
