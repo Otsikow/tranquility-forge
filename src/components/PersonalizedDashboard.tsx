@@ -15,7 +15,13 @@ import {
   Star,
   Calendar,
   Award,
-  Flame
+  Flame,
+  Users,
+  Brain,
+  Moon,
+  ClipboardList,
+  Wind,
+  Sparkles
 } from "lucide-react";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useMeditations } from "@/hooks/useMeditations";
@@ -340,6 +346,37 @@ export default function PersonalizedDashboard({ userName }: PersonalizedDashboar
           <TrendingUp className="h-6 w-6" />
           <span>Log Mood</span>
         </Button>
+      </div>
+
+      {/* Quick Links */}
+      <div>
+        <h3 className="text-lg font-semibold mb-3">Quick Links</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+          <Button variant="ghost" className="h-20 flex-col gap-2" onClick={() => navigate("/community")}>
+            <Users className="h-5 w-5" />
+            <span className="text-xs">Community</span>
+          </Button>
+          <Button variant="ghost" className="h-20 flex-col gap-2" onClick={() => navigate("/cbt")}>
+            <Brain className="h-5 w-5" />
+            <span className="text-xs">CBT Tools</span>
+          </Button>
+          <Button variant="ghost" className="h-20 flex-col gap-2" onClick={() => navigate("/sleep")}>
+            <Moon className="h-5 w-5" />
+            <span className="text-xs">Sleep</span>
+          </Button>
+          <Button variant="ghost" className="h-20 flex-col gap-2" onClick={() => navigate("/assessments")}>
+            <ClipboardList className="h-5 w-5" />
+            <span className="text-xs">Assessments</span>
+          </Button>
+          <Button variant="ghost" className="h-20 flex-col gap-2" onClick={() => navigate("/breathe")}>
+            <Wind className="h-5 w-5" />
+            <span className="text-xs">Breathing</span>
+          </Button>
+          <Button variant="ghost" className="h-20 flex-col gap-2" onClick={() => navigate("/affirmations")}>
+            <Sparkles className="h-5 w-5" />
+            <span className="text-xs">Affirmations</span>
+          </Button>
+        </div>
       </div>
     </div>
   );
