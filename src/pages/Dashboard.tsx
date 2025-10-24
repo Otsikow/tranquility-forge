@@ -20,7 +20,8 @@ import {
   ClipboardList,
   Sparkles,
   Activity,
-  ArrowRight
+  ArrowRight,
+  Shield
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -248,6 +249,18 @@ export default function Dashboard() {
                   <div className="flex items-center gap-3">
                     <Users className="h-5 w-5 text-primary" />
                     <span>Community</span>
+                  </div>
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="lg"
+                  variant="ghost"
+                  className="w-full justify-between"
+                  onClick={() => navigate("/health-support")}
+                >
+                  <div className="flex items-center gap-3">
+                    <Shield className="h-5 w-5 text-primary" />
+                    <span>Health & Support</span>
                   </div>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
