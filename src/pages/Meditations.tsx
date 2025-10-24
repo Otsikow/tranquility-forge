@@ -4,7 +4,7 @@ import { AppBar } from "@/components/AppBar";
 import { BottomNav } from "@/components/BottomNav";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Lock, Clock } from "lucide-react";
+import { Loader2, Lock, Clock, Wind, Sparkles } from "lucide-react";
 import { useMeditations } from "@/hooks/useMeditations";
 import icelandImage from "@/assets/iceland-lights.jpg";
 
@@ -40,6 +40,52 @@ export default function Meditations() {
       </div>
 
       <div className="px-6 py-6 max-w-6xl mx-auto">
+        {/* Quick Access Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <Card 
+            className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:-translate-y-1 bg-gradient-to-br from-primary/10 to-primary/5"
+            onClick={() => navigate("/breathe")}
+          >
+            <CardContent className="p-6 flex items-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-primary/20 flex items-center justify-center">
+                <Wind className="w-7 h-7 text-primary" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-lg text-foreground mb-1">
+                  Breathing Exercises
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Calm your mind with guided breathing
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:-translate-y-1 bg-gradient-to-br from-primary/10 to-primary/5"
+            onClick={() => navigate("/affirmations")}
+          >
+            <CardContent className="p-6 flex items-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-primary/20 flex items-center justify-center">
+                <Sparkles className="w-7 h-7 text-primary" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-lg text-foreground mb-1">
+                  Daily Affirmations
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Start your day with positivity
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Guided Meditations Section */}
+        <h3 className="text-2xl font-bold text-foreground mb-6">
+          Guided Meditations
+        </h3>
+
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />

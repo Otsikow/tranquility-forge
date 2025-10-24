@@ -4,10 +4,6 @@ import {
   Music,
   MessageCircle,
   User,
-  Users,
-  Brain,
-  Moon,
-  ClipboardList,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -16,11 +12,7 @@ const navItems = [
   { icon: Home, label: "Home", path: "/dashboard" },
   { icon: BookOpen, label: "Journal", path: "/journal" },
   { icon: Music, label: "Meditate", path: "/meditations" },
-  { icon: Users, label: "Community", path: "/community" },
-  { icon: Brain, label: "CBT Tools", path: "/cbt" },
-  { icon: Moon, label: "Sleep", path: "/sleep" },
-  { icon: ClipboardList, label: "Assess", path: "/assessments" },
-  { icon: MessageCircle, label: "AI Chat", path: "/chat" },
+  { icon: MessageCircle, label: "Chat", path: "/chat" },
   { icon: User, label: "Profile", path: "/profile" },
 ];
 
