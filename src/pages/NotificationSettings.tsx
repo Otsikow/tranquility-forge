@@ -19,6 +19,7 @@ import {
 import { notificationService } from "@/lib/notificationService";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/BottomNav";
+import { AppBar } from "@/components/AppBar";
 
 interface NotificationSettings {
   enabled: boolean;
@@ -165,13 +166,7 @@ export default function NotificationSettings() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <div className="bg-card border-b border-border px-6 py-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Notification Settings</h1>
-          <p className="text-muted-foreground">Manage your notification preferences</p>
-        </div>
-      </div>
+      <AppBar title="Notification Settings" />
 
       <div className="px-6 py-6 space-y-6">
         {/* Permission Status */}

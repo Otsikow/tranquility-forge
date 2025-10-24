@@ -16,7 +16,7 @@ export default function Moods() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <AppBar title="Mood & Wellness" showBack={false} />
+      <AppBar title="Mood & Wellness" />
 
       <div className="px-6 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
