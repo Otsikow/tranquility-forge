@@ -38,6 +38,11 @@ const About = lazy(() => import("./pages/settings/About"));
 const Legal = lazy(() => import("./pages/settings/Legal"));
 const Admin = lazy(() => import("./pages/Admin"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+// Phase 2 pages
+const Community = lazy(() => import("./pages/Community"));
+const CBT = lazy(() => import("./pages/CBT"));
+const Sleep = lazy(() => import("./pages/Sleep"));
+const Premium = lazy(() => import("./pages/Premium"));
 
 const queryClient = new QueryClient();
 
@@ -77,6 +82,11 @@ const App = () => {
             <Route path="/meditations/:id" element={<MeditationPlayer />} />
             <Route path="/affirmations" element={<Affirmations />} />
             <Route path="/breathe" element={<Breathe />} />
+              {/* Phase 2 routes */}
+              <Route path="/community" element={<Community />} />
+              <Route path="/cbt" element={<CBT />} />
+              <Route path="/sleep" element={<Sleep />} />
+              <Route path="/premium" element={<Premium />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/settings/profile-security" element={<ProfileSecurity />} />

@@ -12,7 +12,7 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
-import { Book, Music, FileText, Calendar } from "lucide-react";
+import { Book, Music, FileText, Calendar, Users, Brain, Moon, Crown } from "lucide-react";
 import { format } from "date-fns";
 
 interface SearchResult {
@@ -220,6 +220,26 @@ export function CommandPalette() {
             ))}
           </CommandGroup>
         )}
+
+        {/* Quick navigation */}
+        <CommandGroup heading="Navigate">
+          <CommandItem onSelect={() => { close(); navigate('/community'); }} className="flex items-center gap-3 py-3">
+            <Users className="h-4 w-4 text-primary" />
+            <span>Community</span>
+          </CommandItem>
+          <CommandItem onSelect={() => { close(); navigate('/cbt'); }} className="flex items-center gap-3 py-3">
+            <Brain className="h-4 w-4 text-primary" />
+            <span>CBT Tools</span>
+          </CommandItem>
+          <CommandItem onSelect={() => { close(); navigate('/sleep'); }} className="flex items-center gap-3 py-3">
+            <Moon className="h-4 w-4 text-primary" />
+            <span>Sleep</span>
+          </CommandItem>
+          <CommandItem onSelect={() => { close(); navigate('/premium'); }} className="flex items-center gap-3 py-3">
+            <Crown className="h-4 w-4 text-primary" />
+            <span>Premium</span>
+          </CommandItem>
+        </CommandGroup>
       </CommandList>
     </CommandDialog>
   );
