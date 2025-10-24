@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Send, 
@@ -19,6 +18,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/BottomNav";
+import { AppBar } from "@/components/AppBar";
 
 interface ChatMessage {
   id: string;
@@ -170,23 +170,7 @@ export default function EnhancedChat() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <div className="bg-card border-b border-border px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <Bot className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-lg font-semibold text-foreground">Peace AI</h1>
-              <p className="text-sm text-muted-foreground">Your mental health companion</p>
-            </div>
-          </div>
-          <Badge variant="outline" className="text-green-600 border-green-200">
-            Online
-          </Badge>
-        </div>
-      </div>
+      <AppBar title="Peace AI" />
 
       <div className="flex flex-col h-[calc(100vh-140px)]">
         {/* Chat Mode Selector */}

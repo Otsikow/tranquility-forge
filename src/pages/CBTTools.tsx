@@ -18,6 +18,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { CBTCategory, CBTExercise, CBTProgress } from "@/types/db";
 import { BottomNav } from "@/components/BottomNav";
+import { AppBar } from "@/components/AppBar";
 
 const categoryIcons = {
   'brain': Brain,
@@ -117,13 +118,7 @@ export default function CBTTools() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <div className="bg-card border-b border-border px-6 py-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">CBT Tools</h1>
-          <p className="text-muted-foreground">Evidence-based exercises for mental wellness</p>
-        </div>
-      </div>
+      <AppBar title="CBT Tools" />
 
       <div className="px-6 py-6 space-y-6">
         <Tabs defaultValue="categories" className="w-full">

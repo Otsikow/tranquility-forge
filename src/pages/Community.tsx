@@ -22,6 +22,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { ForumCategory, ForumPost, UsersProfile } from "@/types/db";
 import { BottomNav } from "@/components/BottomNav";
+import { AppBar } from "@/components/AppBar";
 
 export default function Community() {
   const navigate = useNavigate();
@@ -110,13 +111,11 @@ export default function Community() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <div className="bg-card border-b border-border px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Community</h1>
-            <p className="text-muted-foreground">Connect with others on their wellness journey</p>
-          </div>
+      <AppBar title="Community" />
+
+      <div className="px-6 py-6 space-y-6">
+        {/* Actions & Search */}
+        <div className="flex justify-end">
           <Button asChild>
             <Link to="/community/new-post">
               <Plus className="h-4 w-4 mr-2" />
@@ -124,9 +123,7 @@ export default function Community() {
             </Link>
           </Button>
         </div>
-      </div>
-
-      <div className="px-6 py-6 space-y-6">
+        
         {/* Search */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
