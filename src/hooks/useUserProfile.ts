@@ -37,7 +37,7 @@ export function useUserProfile() {
         .single();
 
       if (error) throw error;
-      setProfile(data);
+      setProfile(data as any);
     } catch (error) {
       console.error('Error fetching profile:', error);
     }
@@ -75,7 +75,7 @@ export function useUserProfile() {
         .order('achieved_at', { ascending: false });
 
       if (error) throw error;
-      setAchievements(data || []);
+      setAchievements((data || []) as any);
     } catch (error) {
       console.error('Error fetching achievements:', error);
     }
@@ -95,7 +95,7 @@ export function useUserProfile() {
         .single();
 
       if (error) throw error;
-      setProfile(data);
+      setProfile(data as any);
       toast({ title: 'Profile updated successfully' });
       return data;
     } catch (error) {

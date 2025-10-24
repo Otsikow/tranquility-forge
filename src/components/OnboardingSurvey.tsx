@@ -179,10 +179,10 @@ export default function OnboardingSurvey({ onComplete, onSkip }: OnboardingSurve
   const canProceed = () => {
     switch (currentStep) {
       case 0: return data.mental_health_goals.length > 0;
-      case 1: return data.experience_level !== '';
-      case 2: return data.preferred_session_length !== '';
+      case 1: return true; // experience_level has a default
+      case 2: return true; // preferred_session_length has a default
       case 3: return data.date_of_birth !== '' && data.gender !== '';
-      case 4: return data.notification_frequency !== '';
+      case 4: return true; // notification_frequency has a default
       default: return true;
     }
   };
@@ -216,7 +216,7 @@ export default function OnboardingSurvey({ onComplete, onSkip }: OnboardingSurve
                             {goal.description}
                           </p>
                         </div>
-                        <Checkbox checked={isSelected} readOnly />
+                        <Checkbox checked={isSelected} disabled />
                       </div>
                     </CardContent>
                   </Card>
@@ -243,7 +243,7 @@ export default function OnboardingSurvey({ onComplete, onSkip }: OnboardingSurve
                 >
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3">
-                      <Checkbox checked={data.experience_level === level.value} readOnly />
+                      <Checkbox checked={data.experience_level === level.value} disabled />
                       <div>
                         <h3 className="font-semibold">{level.label}</h3>
                         <p className="text-sm text-muted-foreground">{level.description}</p>
@@ -278,7 +278,7 @@ export default function OnboardingSurvey({ onComplete, onSkip }: OnboardingSurve
                         <h3 className="font-semibold">{length.label}</h3>
                         <p className="text-sm text-muted-foreground">{length.description}</p>
                       </div>
-                      <Checkbox checked={data.preferred_session_length === length.value} readOnly />
+                      <Checkbox checked={data.preferred_session_length === length.value} disabled />
                     </div>
                   </CardContent>
                 </Card>
@@ -363,7 +363,7 @@ export default function OnboardingSurvey({ onComplete, onSkip }: OnboardingSurve
                         <h3 className="font-semibold">{freq.label}</h3>
                         <p className="text-sm text-muted-foreground">{freq.description}</p>
                       </div>
-                      <Checkbox checked={data.notification_frequency === freq.value} readOnly />
+                      <Checkbox checked={data.notification_frequency === freq.value} disabled />
                     </div>
                   </CardContent>
                 </Card>
