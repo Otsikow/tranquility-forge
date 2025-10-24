@@ -57,7 +57,7 @@ export default function ResetPassword() {
 
   return (
     <div className="min-h-screen bg-card">
-      <AppBar title="Reset Password" />
+      <AppBar title="Reset Password" showBack backTo="/auth/login" />
       
       <div className="flex flex-col items-center justify-center px-6 py-12">
         <div className="w-full max-w-md space-y-8 animate-fade-up">

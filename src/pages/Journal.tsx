@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Loader2 } from "lucide-react";
+import { Plus, Search, Loader2, Sparkles, BookOpen, Heart, ArrowRight } from "lucide-react";
 import { SyncIndicator } from "@/components/SyncIndicator";
 import { useJournalEntries } from "@/hooks/useJournalEntries";
 import { format } from "date-fns";
@@ -77,7 +77,7 @@ export default function Journal() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <AppBar title="My Journal" showBack={false} />
+      <AppBar title="My Journal" showBack backTo="/dashboard" />
 
       {/* Hero Section */}
       <div className="relative h-44 md:h-56 overflow-hidden">
@@ -106,6 +106,44 @@ export default function Journal() {
             New Entry
           </Button>
         </div>
+
+        {/* Quick Links */}
+        <Card className="bg-muted/50">
+          <CardContent className="pt-6">
+            <h3 className="text-lg font-semibold text-foreground mb-4">Journal Tools</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <Button
+                variant="ghost"
+                className="h-16 justify-start gap-3"
+                onClick={() => navigate("/affirmations")}
+              >
+                <div className="w-10 h-10 rounded-full bg-yellow-500 flex items-center justify-center">
+                  <Sparkles className="h-5 w-5 text-white" />
+                </div>
+                <div className="text-left">
+                  <div className="font-medium">Daily Affirmations</div>
+                  <div className="text-sm text-muted-foreground">Positive daily messages</div>
+                </div>
+                <ArrowRight className="h-4 w-4 ml-auto" />
+              </Button>
+              
+              <Button
+                variant="ghost"
+                className="h-16 justify-start gap-3"
+                onClick={() => navigate("/moods")}
+              >
+                <div className="w-10 h-10 rounded-full bg-pink-500 flex items-center justify-center">
+                  <Heart className="h-5 w-5 text-white" />
+                </div>
+                <div className="text-left">
+                  <div className="font-medium">Mood Tracking</div>
+                  <div className="text-sm text-muted-foreground">Track your emotions</div>
+                </div>
+                <ArrowRight className="h-4 w-4 ml-auto" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Search & Filter */}
         <div className="flex flex-col sm:flex-row gap-3">

@@ -1,7 +1,7 @@
 import { AppBar } from "@/components/AppBar";
 import { BottomNav } from "@/components/BottomNav";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronRight, User, Bell, HelpCircle, Info, FileText, Shield } from "lucide-react";
+import { ChevronRight, User, Bell, HelpCircle, Info, FileText, Shield, CreditCard, Crown, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import banffImage from "@/assets/banff-lake.jpg";
 
@@ -14,10 +14,24 @@ const settingsSections = [
     color: "text-primary",
   },
   {
+    title: "Subscription",
+    description: "Manage your subscription and billing",
+    icon: CreditCard,
+    path: "/subscription",
+    color: "text-primary",
+  },
+  {
     title: "Notifications",
     description: "Customize your notification preferences",
     icon: Bell,
     path: "/settings/notifications",
+    color: "text-primary",
+  },
+  {
+    title: "Health & Support",
+    description: "Mental health resources and crisis support",
+    icon: Heart,
+    path: "/health-support",
     color: "text-primary",
   },
   {
