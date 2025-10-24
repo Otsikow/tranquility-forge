@@ -39,6 +39,14 @@ const Legal = lazy(() => import("./pages/settings/Legal"));
 const Admin = lazy(() => import("./pages/Admin"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
+// Phase 2 routes
+const Community = lazy(() => import("./pages/Community"));
+const ForumThread = lazy(() => import("./pages/ForumThread"));
+const SupportGroup = lazy(() => import("./pages/SupportGroup"));
+const CBTTools = lazy(() => import("./pages/CBTTools"));
+const Sleep = lazy(() => import("./pages/Sleep"));
+const Subscription = lazy(() => import("./pages/Subscription"));
+
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -85,6 +93,12 @@ const App = () => {
             <Route path="/settings/about" element={<About />} />
             <Route path="/settings/legal" element={<Legal />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/community/forum/:id" element={<ForumThread />} />
+            <Route path="/community/group/:id" element={<SupportGroup />} />
+            <Route path="/cbt-tools" element={<CBTTools />} />
+            <Route path="/sleep" element={<Sleep />} />
+            <Route path="/subscription" element={<Subscription />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             </Suspense>

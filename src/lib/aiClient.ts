@@ -1,5 +1,6 @@
 import { getOpenAIConfig } from './env';
 import { ChatMessage } from './useChatStore';
+import { THERAPEUTIC_SYSTEM_PROMPT } from './therapeuticPrompts';
 
 export interface StreamOptions {
   signal?: AbortSignal;
@@ -11,6 +12,12 @@ export async function* streamChatCompletion(
 ): AsyncGenerator<string, void, unknown> {
   const config = getOpenAIConfig();
   
+  // Prepend therapeutic system prompt
+  const enhancedMessages = [
+    { role: 'system', content: THERAPEUTIC_SYSTEM_PROMPT },
+    ...messages
+  ];
+  
   const response = await fetch(config.baseURL, {
     method: 'POST',
     headers: {
@@ -18,7 +25,7 @@ export async function* streamChatCompletion(
       'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
     },
     body: JSON.stringify({
-      messages: messages.map(({ role, content }) => ({ role, content })),
+      messages: enhancedMessages.map(({ role, content }) => ({ role, content })),
     }),
     signal: options?.signal,
   });

@@ -2,10 +2,21 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { BottomNav } from "@/components/BottomNav";
 import { MoodChart } from "@/components/MoodChart";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Leaf, BookOpen, Wind, MessageCircle, Settings } from "lucide-react";
+import { 
+  BookOpen, 
+  Wind, 
+  MessageCircle, 
+  Settings, 
+  Brain, 
+  Moon, 
+  Users, 
+  TrendingUp,
+  Sparkles 
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import logoImage from "@/assets/logo.png";
 import hummingbirdImage from "@/assets/hummingbird.png";
@@ -133,6 +144,69 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
+        {/* Feature Grid */}
+        <div className="grid grid-cols-2 gap-4">
+          <Card 
+            className="cursor-pointer hover:bg-accent/50 transition-colors"
+            onClick={() => navigate("/chat")}
+          >
+            <CardContent className="pt-6">
+              <div className="flex flex-col items-center text-center space-y-2">
+                <div className="p-3 rounded-full bg-primary/10">
+                  <MessageCircle className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="font-semibold">AI Chat</h3>
+                <p className="text-xs text-muted-foreground">Talk with Peace</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className="cursor-pointer hover:bg-accent/50 transition-colors"
+            onClick={() => navigate("/cbt-tools")}
+          >
+            <CardContent className="pt-6">
+              <div className="flex flex-col items-center text-center space-y-2">
+                <div className="p-3 rounded-full bg-blue-500/10">
+                  <Brain className="h-6 w-6 text-blue-500" />
+                </div>
+                <h3 className="font-semibold">CBT Tools</h3>
+                <p className="text-xs text-muted-foreground">Therapy exercises</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className="cursor-pointer hover:bg-accent/50 transition-colors"
+            onClick={() => navigate("/sleep")}
+          >
+            <CardContent className="pt-6">
+              <div className="flex flex-col items-center text-center space-y-2">
+                <div className="p-3 rounded-full bg-indigo-500/10">
+                  <Moon className="h-6 w-6 text-indigo-500" />
+                </div>
+                <h3 className="font-semibold">Sleep</h3>
+                <p className="text-xs text-muted-foreground">Stories & sounds</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className="cursor-pointer hover:bg-accent/50 transition-colors"
+            onClick={() => navigate("/community")}
+          >
+            <CardContent className="pt-6">
+              <div className="flex flex-col items-center text-center space-y-2">
+                <div className="p-3 rounded-full bg-green-500/10">
+                  <Users className="h-6 w-6 text-green-500" />
+                </div>
+                <h3 className="font-semibold">Community</h3>
+                <p className="text-xs text-muted-foreground">Connect & share</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Quick Actions */}
         <div className="space-y-3">
           <Button
@@ -145,23 +219,39 @@ export default function Dashboard() {
           </Button>
           <Button
             size="lg"
-            variant="dark"
+            variant="outline"
             className="w-full justify-start"
-            onClick={() => navigate("/breathe")}
+            onClick={() => navigate("/meditations")}
           >
             <Wind className="h-5 w-5 mr-2" />
             Start Meditation
           </Button>
-          <Button
-            size="lg"
-            variant="dark"
-            className="w-full justify-start"
-            onClick={() => navigate("/chat")}
-          >
-            <MessageCircle className="h-5 w-5 mr-2" />
-            Talk to Peace
-          </Button>
         </div>
+
+        {/* Upgrade Prompt */}
+        <Card className="bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-amber-500/20">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-lg bg-amber-500/20">
+                <Sparkles className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+              </div>
+              <div className="flex-1 space-y-3">
+                <div>
+                  <h3 className="font-semibold mb-1">Unlock Premium Features</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Get unlimited AI chat, advanced CBT tools, and more
+                  </p>
+                </div>
+                <Button 
+                  className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+                  onClick={() => navigate("/subscription")}
+                >
+                  View Plans
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <BottomNav />
