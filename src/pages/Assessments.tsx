@@ -54,7 +54,8 @@ const availableAssessments = [
     bgColor: 'bg-orange-100',
     category: 'Stress',
     lastTaken: null,
-    recommended: false
+    recommended: false,
+    comingSoon: true
   },
   {
     id: 'sleep_hygiene',
@@ -66,7 +67,8 @@ const availableAssessments = [
     bgColor: 'bg-indigo-100',
     category: 'Sleep',
     lastTaken: null,
-    recommended: false
+    recommended: false,
+    comingSoon: true
   }
 ];
 
@@ -212,6 +214,7 @@ export default function Assessments() {
                         variant="outline" 
                         className="w-full"
                         onClick={() => setSelectedAssessment(assessment.id)}
+                        disabled={(assessment as any).comingSoon}
                       >
                         Retake Assessment
                       </Button>
@@ -231,8 +234,9 @@ export default function Assessments() {
                     <Button 
                       className="w-full"
                       onClick={() => setSelectedAssessment(assessment.id)}
+                      disabled={(assessment as any).comingSoon}
                     >
-                      Start Assessment
+                      {(assessment as any).comingSoon ? 'Coming Soon' : 'Start Assessment'}
                     </Button>
                   )}
                 </CardContent>
