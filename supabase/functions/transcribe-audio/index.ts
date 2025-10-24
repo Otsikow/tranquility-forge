@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { audio } = await req.json();
+    const { audio, mimeType } = await req.json();
     
     if (!audio) {
       throw new Error('No audio data provided');
@@ -34,8 +34,20 @@ serve(async (req) => {
 
     // Create form data for OpenAI Whisper API
     const formData = new FormData();
-    const blob = new Blob([bytes], { type: 'audio/webm' });
-    formData.append('file', blob, 'audio.webm');
+    const safeMime = typeof mimeType === 'string' && mimeType.length > 0 ? mimeType : 'audio/webm';
+    // Guess extension from mime
+    const ext = safeMime.includes('ogg')
+      ? 'ogg'
+      : safeMime.includes('mpeg')
+      ? 'mp3'
+      : safeMime.includes('wav')
+      ? 'wav'
+      : safeMime.includes('mp4')
+      ? 'm4a'
+      : 'webm';
+
+    const blob = new Blob([bytes], { type: safeMime });
+    formData.append('file', blob, `audio.${ext}`);
     formData.append('model', 'whisper-1');
 
     console.log('Sending to OpenAI Whisper API');
