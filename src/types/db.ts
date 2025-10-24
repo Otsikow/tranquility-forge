@@ -18,7 +18,12 @@ export type SessionLength = "short" | "medium" | "long";
 export type NotificationFrequency = "none" | "daily" | "weekly" | "custom";
 
 export type AssessmentType = "phq9" | "gad7" | "pss10" | "sleep_hygiene";
-export type AssessmentSeverity = "minimal" | "mild" | "moderate" | "moderately_severe" | "severe";
+export type AssessmentSeverity =
+  | "minimal"
+  | "mild"
+  | "moderate"
+  | "moderately_severe"
+  | "severe";
 
 /* -------------------------------------------------------------
    Core User and Journal Types
@@ -30,6 +35,12 @@ export interface UsersProfile {
   avatar_url: string | null;
   timezone: string;
   created_at: string;
+
+  // Combined fields from both branches:
+  goals?: string[]; // e.g., ['stress', 'sleep', 'anxiety']
+  preferences?: Record<string, unknown>; // jsonb map for personalization
+  demographics?: Record<string, unknown>; // jsonb map (age_range, region, etc.)
+
   mental_health_goals: MentalHealthGoal[];
   experience_level: ExperienceLevel;
   preferred_session_length: SessionLength;
@@ -50,6 +61,10 @@ export interface UsersProfile {
   location_city: string | null;
 }
 
+/* -------------------------------------------------------------
+   Journal and Meditation Data
+-------------------------------------------------------------- */
+
 export interface JournalEntry {
   id: string;
   user_id: string;
@@ -69,6 +84,9 @@ export interface Meditation {
   audio_url: string | null;
   is_free: boolean;
   created_at: string;
+  categories?: string[];
+  tags?: string[];
+  level?: "beginner" | "intermediate" | "advanced";
 }
 
 export interface SessionPlayed {
@@ -86,37 +104,33 @@ export interface SessionPlayed {
 export type InsertUsersProfile = Omit<UsersProfile, "id" | "created_at"> & {
   id: string;
 };
-export type InsertJournalEntry = Omit<JournalEntry, "id" | "created_at" | "tags"> & {
+export type InsertJournalEntry = Omit<
+  JournalEntry,
+  "id" | "created_at" | "tags"
+> & {
   tags?: string[];
 };
-export type InsertMeditation = Omit<Meditation, "id" | "created_at" | "is_free"> & {
+export type InsertMeditation = Omit<
+  Meditation,
+  "id" | "created_at" | "is_free"
+> & {
   is_free?: boolean;
 };
-export type InsertSessionPlayed = Omit<SessionPlayed, "id" | "started_at">;
+export type InsertSessionPlayed = Omit<
+  SessionPlayed,
+  "id" | "started_at"
+>;
 
-export type UpdateUsersProfile = Partial<Omit<UsersProfile, "id" | "created_at">>;
-export type UpdateJournalEntry = Partial<Omit<JournalEntry, "id" | "user_id" | "created_at">>;
+export type UpdateUsersProfile = Partial<
+  Omit<UsersProfile, "id" | "created_at">
+>;
+export type UpdateJournalEntry = Partial<
+  Omit<JournalEntry, "id" | "user_id" | "created_at">
+>;
 export type UpdateMeditation = Partial<Omit<Meditation, "id" | "created_at">>;
 export type UpdateSessionPlayed = Partial<
   Omit<SessionPlayed, "id" | "user_id" | "meditation_id" | "started_at">
 >;
-
-/* -------------------------------------------------------------
-   Relations
--------------------------------------------------------------- */
-
-export interface JournalEntryWithProfile extends JournalEntry {
-  profile?: UsersProfile;
-}
-
-export interface SessionWithMeditation extends SessionPlayed {
-  meditation?: Meditation;
-}
-
-export interface MeditationWithStats extends Meditation {
-  total_plays?: number;
-  avg_completion_rate?: number;
-}
 
 /* -------------------------------------------------------------
    Community Forum
@@ -307,7 +321,7 @@ export interface UserNotification {
 }
 
 /* -------------------------------------------------------------
-   User Preferences and Analytics (from main branch)
+   User Preferences, Achievements, Analytics
 -------------------------------------------------------------- */
 
 export interface UserPreferences {
@@ -393,43 +407,3 @@ export interface ContentRecommendation {
   created_at: string;
   expires_at: string | null;
 }
-
-/* -------------------------------------------------------------
-   Insert and Update Types for Advanced Tables
--------------------------------------------------------------- */
-
-export type InsertUserPreferences = Omit<
-  UserPreferences,
-  "id" | "created_at" | "updated_at"
->;
-export type InsertUserAchievement = Omit<UserAchievement, "id" | "achieved_at">;
-export type InsertUserActivityLog = Omit<UserActivityLog, "id" | "created_at">;
-export type InsertContentRecommendation = Omit<
-  ContentRecommendation,
-  "id" | "created_at"
->;
-
-export type UpdateUserPreferences = Partial<
-  Omit<UserPreferences, "id" | "user_id" | "created_at" | "updated_at">
->;
-export type UpdateUserAchievement = Partial<
-  Omit<UserAchievement, "id" | "user_id" | "achieved_at">
->;
-export type UpdateUserActivityLog = Partial<
-  Omit<UserActivityLog, "id" | "user_id" | "created_at">
->;
-export type UpdateContentRecommendation = Partial<
-  Omit<ContentRecommendation, "id" | "user_id" | "created_at">
->;
-
-/* -------------------------------------------------------------
-   Insert and Update Types for Assessment System
--------------------------------------------------------------- */
-
-export type InsertAssessment = Omit<Assessment, "id" | "created_at" | "updated_at">;
-export type InsertAssessmentResult = Omit<AssessmentResult, "id" | "completed_at" | "created_at">;
-export type InsertAssessmentProgress = Omit<AssessmentProgress, "id" | "started_at" | "updated_at">;
-
-export type UpdateAssessment = Partial<Omit<Assessment, "id" | "created_at" | "updated_at">>;
-export type UpdateAssessmentResult = Partial<Omit<AssessmentResult, "id" | "user_id" | "created_at">>;
-export type UpdateAssessmentProgress = Partial<Omit<AssessmentProgress, "id" | "user_id" | "started_at" | "updated_at">>;
