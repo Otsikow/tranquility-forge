@@ -20,6 +20,7 @@ import ResetPassword from "./pages/auth/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 
 // Lazy load for optimization
+const Wellness = lazy(() => import("./pages/Wellness"));
 const Chat = lazy(() => import("./pages/EnhancedChat"));
 const Moods = lazy(() => import("./pages/Moods"));
 const Journal = lazy(() => import("./pages/Journal"));
@@ -84,6 +85,7 @@ const App = () => {
                 <Route path="/dashboard" element={<Dashboard />} />
 
                 {/* Main Features */}
+                <Route path="/wellness" element={<Wellness />} />
                 <Route path="/chat" element={<Chat />} />
                 <Route path="/moods" element={<Moods />} />
                 <Route path="/journal" element={<Journal />} />
