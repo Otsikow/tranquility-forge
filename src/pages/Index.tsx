@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Leaf, Heart, BookOpen, MessageCircle, Wind, Sparkles } from "lucide-react";
 import { Footer } from "@/components/Footer";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import logoImage from "@/assets/logo.png";
 import eagleImage from "@/assets/bald-eagle.jpg";
 import bettaFishImage from "@/assets/betta-fish.jpg";
@@ -48,13 +49,13 @@ export default function Index() {
         <img src={eagleImage} alt="Bald eagle soaring over majestic mountains" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/60 to-background" />
         
-        {/* Logo in top left */}
-        <div className="absolute top-6 left-6 z-10">
-          
+        {/* Theme toggle in top right */}
+        <div className="absolute top-6 right-6 z-10">
+          <ThemeToggle />
         </div>
         
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-          <img src={logoImage} alt="Peace Logo" className="h-24 w-24 mb-4 drop-shadow-xl animate-fade-up" />
+          <img src={logoImage} alt="Peace Logo" className="h-48 w-48 mb-4 drop-shadow-xl animate-fade-up" />
           <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-6 animate-fade-up" style={{
           animationDelay: '0.1s'
         }}>

@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      content_recommendations: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          recommendation_reason: string | null
+          recommendation_score: number
+          user_id: string
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          recommendation_reason?: string | null
+          recommendation_score: number
+          user_id: string
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          recommendation_reason?: string | null
+          recommendation_score?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       downloads: {
         Row: {
           downloaded_at: string | null
@@ -213,6 +246,105 @@ export type Database = {
         }
         Relationships: []
       }
+      user_achievements: {
+        Row: {
+          achieved_at: string | null
+          achievement_key: string
+          achievement_type: string
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          achieved_at?: string | null
+          achievement_key: string
+          achievement_type: string
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          achieved_at?: string | null
+          achievement_key?: string
+          achievement_type?: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_activity_log: {
+        Row: {
+          activity_id: string | null
+          activity_type: string
+          created_at: string | null
+          duration_seconds: number | null
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          activity_id?: string | null
+          activity_type: string
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          activity_id?: string | null
+          activity_type?: string
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_preferences: {
+        Row: {
+          community_participation_enabled: boolean | null
+          created_at: string | null
+          data_sharing_enabled: boolean | null
+          id: string
+          journal_reminders_enabled: boolean | null
+          meditation_reminders_enabled: boolean | null
+          mood_check_reminders_enabled: boolean | null
+          reminder_time: string | null
+          updated_at: string | null
+          user_id: string
+          weekly_insights_enabled: boolean | null
+        }
+        Insert: {
+          community_participation_enabled?: boolean | null
+          created_at?: string | null
+          data_sharing_enabled?: boolean | null
+          id?: string
+          journal_reminders_enabled?: boolean | null
+          meditation_reminders_enabled?: boolean | null
+          mood_check_reminders_enabled?: boolean | null
+          reminder_time?: string | null
+          updated_at?: string | null
+          user_id: string
+          weekly_insights_enabled?: boolean | null
+        }
+        Update: {
+          community_participation_enabled?: boolean | null
+          created_at?: string | null
+          data_sharing_enabled?: boolean | null
+          id?: string
+          journal_reminders_enabled?: boolean | null
+          meditation_reminders_enabled?: boolean | null
+          mood_check_reminders_enabled?: boolean | null
+          reminder_time?: string | null
+          updated_at?: string | null
+          user_id?: string
+          weekly_insights_enabled?: boolean | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
@@ -238,23 +370,77 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          current_streak_days: number | null
+          date_of_birth: string | null
           display_name: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          experience_level: string | null
+          gender: string | null
           id: string
+          last_active_at: string | null
+          location_city: string | null
+          location_country: string | null
+          longest_streak_days: number | null
+          mental_health_goals: string[] | null
+          notification_frequency: string | null
+          onboarding_completed: boolean | null
+          preferred_content_categories: string[] | null
+          preferred_session_length: string | null
           timezone: string | null
+          timezone_offset: number | null
+          total_journal_entries: number | null
+          total_meditation_minutes: number | null
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          current_streak_days?: number | null
+          date_of_birth?: string | null
           display_name?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          experience_level?: string | null
+          gender?: string | null
           id: string
+          last_active_at?: string | null
+          location_city?: string | null
+          location_country?: string | null
+          longest_streak_days?: number | null
+          mental_health_goals?: string[] | null
+          notification_frequency?: string | null
+          onboarding_completed?: boolean | null
+          preferred_content_categories?: string[] | null
+          preferred_session_length?: string | null
           timezone?: string | null
+          timezone_offset?: number | null
+          total_journal_entries?: number | null
+          total_meditation_minutes?: number | null
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
+          current_streak_days?: number | null
+          date_of_birth?: string | null
           display_name?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          experience_level?: string | null
+          gender?: string | null
           id?: string
+          last_active_at?: string | null
+          location_city?: string | null
+          location_country?: string | null
+          longest_streak_days?: number | null
+          mental_health_goals?: string[] | null
+          notification_frequency?: string | null
+          onboarding_completed?: boolean | null
+          preferred_content_categories?: string[] | null
+          preferred_session_length?: string | null
           timezone?: string | null
+          timezone_offset?: number | null
+          total_journal_entries?: number | null
+          total_meditation_minutes?: number | null
         }
         Relationships: []
       }
@@ -263,16 +449,40 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_user_download_size: {
+      check_achievements: {
         Args: { p_user_id: string }
-        Returns: number
+        Returns: {
+          achieved_at: string | null
+          achievement_key: string
+          achievement_type: string
+          id: string
+          metadata: Json | null
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "user_achievements"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
+      get_user_download_size: { Args: { p_user_id: string }; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      log_user_activity: {
+        Args: {
+          p_activity_id?: string
+          p_activity_type: string
+          p_duration_seconds?: number
+          p_metadata?: Json
+          p_user_id: string
+        }
+        Returns: string
       }
     }
     Enums: {
