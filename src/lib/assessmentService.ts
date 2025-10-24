@@ -614,7 +614,11 @@ export async function saveAssessmentProgress(
   currentQuestion: number,
   answers: Record<string, number>
 ): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
   const { error } = await supabase.rpc('save_assessment_progress', {
+    p_user_id: user.id,
     p_assessment_type: assessmentType,
     p_current_question: currentQuestion,
     p_answers: answers
@@ -630,7 +634,11 @@ export async function saveAssessmentProgress(
 export async function getAssessmentProgress(
   assessmentType: AssessmentType
 ): Promise<AssessmentProgress | null> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
   const { data, error } = await supabase.rpc('get_assessment_progress', {
+    p_user_id: user.id,
     p_assessment_type: assessmentType
   });
 
@@ -639,7 +647,18 @@ export async function getAssessmentProgress(
     return null;
   }
 
-  return data?.[0] || null;
+  if (!data || data.length === 0) return null;
+
+  const progress = data[0];
+  return {
+    id: progress.id,
+    user_id: user.id,
+    assessment_type: assessmentType,
+    current_question: progress.current_question,
+    answers: progress.answers as Record<string, any>,
+    started_at: progress.started_at,
+    updated_at: new Date().toISOString()
+  };
 }
 
 // Complete assessment
@@ -648,6 +667,9 @@ export async function completeAssessment(
   score: number,
   responses: Record<string, number>
 ): Promise<AssessmentResult> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
   const severity = calculateSeverity(assessmentType, score);
   const { interpretation, recommendations, resources } = generateInterpretation(
     assessmentType, 
@@ -656,6 +678,7 @@ export async function completeAssessment(
   );
 
   const { data, error } = await supabase.rpc('complete_assessment', {
+    p_user_id: user.id,
     p_assessment_type: assessmentType,
     p_score: score,
     p_severity: severity,
@@ -675,14 +698,14 @@ export async function completeAssessment(
     .from('assessment_results')
     .select('*')
     .eq('id', data)
-    .single();
+    .maybeSingle();
 
-  if (fetchError) {
+  if (fetchError || !result) {
     console.error('Error fetching assessment result:', fetchError);
     throw new Error('Failed to fetch assessment result');
   }
 
-  return result;
+  return result as AssessmentResult;
 }
 
 // Get assessment history
@@ -690,9 +713,12 @@ export async function getAssessmentHistory(
   assessmentType?: AssessmentType,
   limit: number = 10
 ): Promise<AssessmentResult[]> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
   const { data, error } = await supabase.rpc('get_assessment_history', {
-    p_assessment_type: assessmentType || null,
-    p_limit: limit
+    p_user_id: user.id,
+    p_assessment_type: assessmentType || null
   });
 
   if (error) {
@@ -700,7 +726,22 @@ export async function getAssessmentHistory(
     return [];
   }
 
-  return data || [];
+  if (!data) return [];
+
+  // Map the RPC return data to full AssessmentResult objects
+  return (data as any[]).map(item => ({
+    id: item.id,
+    user_id: user.id,
+    assessment_type: assessmentType as AssessmentType,
+    score: item.score,
+    severity: item.severity as AssessmentSeverity,
+    interpretation: item.interpretation,
+    recommendations: item.recommendations,
+    resources: item.resources,
+    responses: {},
+    completed_at: item.completed_at,
+    created_at: item.completed_at
+  })).slice(0, limit);
 }
 
 // Get assessment history with insights

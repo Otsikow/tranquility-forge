@@ -147,6 +147,8 @@ export interface ForumPost {
   last_reply_at: string | null;
   created_at: string;
   updated_at: string;
+  category?: ForumCategory;
+  profile?: UsersProfile;
 }
 
 export interface ForumReply {
@@ -158,6 +160,7 @@ export interface ForumReply {
   likes: number;
   created_at: string;
   updated_at: string;
+  profile?: UsersProfile;
 }
 
 /* -------------------------------------------------------------
@@ -185,6 +188,7 @@ export interface CBTExercise {
   difficulty_level: number | null;
   is_premium: boolean;
   created_at: string;
+  category?: CBTCategory;
 }
 
 export interface CBTProgress {

@@ -63,11 +63,12 @@ class NotificationService {
     }
 
     try {
+      const vapidKey = this.urlBase64ToUint8Array(
+        import.meta.env.VITE_VAPID_PUBLIC_KEY || ''
+      );
       const subscription = await this.registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: this.urlBase64ToUint8Array(
-          import.meta.env.VITE_VAPID_PUBLIC_KEY || ''
-        )
+        applicationServerKey: vapidKey.buffer as ArrayBuffer
       });
 
       // Save subscription to database
@@ -102,7 +103,6 @@ class NotificationService {
       badge: data.badge || '/logo.png',
       tag: data.tag,
       data: data.data,
-      actions: data.actions,
       requireInteraction: false,
       silent: false
     };
@@ -128,7 +128,7 @@ class NotificationService {
   ): Promise<number> {
     return setInterval(() => {
       this.showNotification(data);
-    }, interval);
+    }, interval) as unknown as number;
   }
 
   async cancelScheduledNotification(intervalId: number): Promise<void> {

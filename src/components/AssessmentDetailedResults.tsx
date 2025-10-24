@@ -28,6 +28,7 @@ import {
 
 interface AssessmentDetailedResultsProps {
   assessmentType: AssessmentType;
+  result?: any;
   onClose: () => void;
 }
 

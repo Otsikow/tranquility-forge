@@ -94,7 +94,7 @@ export default function Subscription() {
         .single();
 
       if (subscriptionData) {
-        setCurrentSubscription(subscriptionData);
+        setCurrentSubscription(subscriptionData as UserSubscription);
       }
 
       // Load premium features
@@ -104,7 +104,7 @@ export default function Subscription() {
         .order('tier_required', { ascending: true });
 
       if (featuresData) {
-        setPremiumFeatures(featuresData);
+        setPremiumFeatures(featuresData as PremiumFeature[]);
       }
     } catch (error) {
       console.error('Error loading subscription data:', error);
