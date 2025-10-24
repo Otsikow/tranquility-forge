@@ -7,10 +7,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Hash, X } from "lucide-react";
+import { Hash, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ForumCategory } from "@/types/db";
 import { BottomNav } from "@/components/BottomNav";
+import { AppBar } from "@/components/AppBar";
 
 export default function NewForumPost() {
   const navigate = useNavigate();
@@ -88,15 +89,10 @@ export default function NewForumPost() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <div className="bg-card border-b border-border px-6 py-4">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/community')}>
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-lg font-semibold">New Post</h1>
-          </div>
+      <AppBar title="New Post" showBack backTo="/community" />
+
+      <div className="px-6 py-6 space-y-6">
+        <div className="flex justify-end">
           <Button 
             onClick={handleSubmit}
             disabled={!title.trim() || !content.trim() || !selectedCategory || submitting}
@@ -104,9 +100,6 @@ export default function NewForumPost() {
             {submitting ? 'Posting...' : 'Post'}
           </Button>
         </div>
-      </div>
-
-      <div className="px-6 py-6 space-y-6">
         {/* Category Selection */}
         <Card>
           <CardHeader>
