@@ -4,14 +4,14 @@ import { BottomNav } from "@/components/BottomNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Brain, 
-  Heart, 
-  Target, 
-  Clock, 
-  Shield, 
+import {
+  Brain,
+  Heart,
+  Target,
+  Clock,
+  Shield,
   AlertTriangle,
   CheckCircle,
   BarChart3,
@@ -19,55 +19,56 @@ import {
   Download,
   TrendingUp,
   Calendar,
-  FileText
+  FileText,
 } from "lucide-react";
 import SelfAssessment from "@/components/SelfAssessment";
 import AssessmentDetailedResults from "@/components/AssessmentDetailedResults";
 import type { AssessmentResult } from "@/components/SelfAssessment";
-import { 
-  getAvailableAssessments, 
+import {
+  getAvailableAssessments,
   getAssessmentHistoryWithInsights,
   exportAssessmentResults,
   type AssessmentType,
-  type AssessmentResultWithInsights
+  type AssessmentResultWithInsights,
 } from "@/lib/assessmentService";
 
+// Icons and colors
 const assessmentIcons = {
   phq9: Heart,
   gad7: Brain,
   pss10: Target,
-  sleep_hygiene: Clock
+  sleep_hygiene: Clock,
 };
 
 const assessmentColors = {
-  phq9: 'text-blue-500',
-  gad7: 'text-purple-500',
-  pss10: 'text-orange-500',
-  sleep_hygiene: 'text-indigo-500'
+  phq9: "text-blue-500",
+  gad7: "text-purple-500",
+  pss10: "text-orange-500",
+  sleep_hygiene: "text-indigo-500",
 };
 
 const assessmentBgColors = {
-  phq9: 'bg-blue-100',
-  gad7: 'bg-purple-100',
-  pss10: 'bg-orange-100',
-  sleep_hygiene: 'bg-indigo-100'
+  phq9: "bg-blue-100",
+  gad7: "bg-purple-100",
+  pss10: "bg-orange-100",
+  sleep_hygiene: "bg-indigo-100",
 };
 
 const categories = [
-  { key: 'all', label: 'All Assessments', icon: BarChart3 },
-  { key: 'Mental Health', label: 'Mental Health', icon: Heart },
-  { key: 'Stress', label: 'Stress', icon: Target },
-  { key: 'Sleep', label: 'Sleep', icon: Clock }
+  { key: "all", label: "All Assessments", icon: BarChart3 },
+  { key: "Mental Health", label: "Mental Health", icon: Heart },
+  { key: "Stress", label: "Stress", icon: Target },
+  { key: "Sleep", label: "Sleep", icon: Clock },
 ];
 
 export default function Assessments() {
   const [selectedAssessment, setSelectedAssessment] = useState<AssessmentType | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [assessmentResults, setAssessmentResults] = useState<Record<string, AssessmentResult>>({});
   const [availableAssessments, setAvailableAssessments] = useState<any[]>([]);
   const [assessmentHistory, setAssessmentHistory] = useState<AssessmentResultWithInsights[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('assessments');
+  const [activeTab, setActiveTab] = useState("assessments");
   const [detailedResultsAssessment, setDetailedResultsAssessment] = useState<AssessmentType | null>(null);
 
   useEffect(() => {
@@ -76,13 +77,13 @@ export default function Assessments() {
         setIsLoading(true);
         const [assessments, history] = await Promise.all([
           getAvailableAssessments(),
-          getAssessmentHistoryWithInsights('phq9', 5) // Load recent PHQ-9 results as example
+          getAssessmentHistoryWithInsights("phq9", 5),
         ]);
-        
+
         setAvailableAssessments(assessments);
         setAssessmentHistory(history);
       } catch (error) {
-        console.error('Error loading assessment data:', error);
+        console.error("Error loading assessment data:", error);
       } finally {
         setIsLoading(false);
       }
@@ -91,55 +92,61 @@ export default function Assessments() {
     loadData();
   }, []);
 
-  const filteredAssessments = selectedCategory === 'all' 
-    ? availableAssessments 
-    : availableAssessments.filter(a => a.category === selectedCategory);
+  const filteredAssessments =
+    selectedCategory === "all"
+      ? availableAssessments
+      : availableAssessments.filter((a) => a.category === selectedCategory);
 
   const handleAssessmentComplete = async (assessmentId: AssessmentType, result: AssessmentResult) => {
-    setAssessmentResults(prev => ({ ...prev, [assessmentId]: result }));
+    setAssessmentResults((prev) => ({ ...prev, [assessmentId]: result }));
     setSelectedAssessment(null);
-    
-    // Refresh history
+
     try {
       const history = await getAssessmentHistoryWithInsights(assessmentId, 5);
-      setAssessmentHistory(prev => [...history, ...prev.filter(h => h.assessment_type !== assessmentId)]);
+      setAssessmentHistory((prev) => [...history, ...prev.filter((h) => h.assessment_type !== assessmentId)]);
     } catch (error) {
-      console.error('Error refreshing assessment history:', error);
+      console.error("Error refreshing assessment history:", error);
     }
   };
 
   const getAssessmentStatus = (assessmentId: AssessmentType) => {
     const result = assessmentResults[assessmentId];
     if (!result) return null;
-    
+
     const getStatusColor = (level: string) => {
       switch (level) {
-        case 'minimal': return 'text-green-600';
-        case 'mild': return 'text-yellow-600';
-        case 'moderate': return 'text-orange-600';
-        case 'moderately_severe': return 'text-red-600';
-        case 'severe': return 'text-red-700';
-        default: return 'text-gray-600';
+        case "minimal":
+          return "text-green-600";
+        case "mild":
+          return "text-yellow-600";
+        case "moderate":
+          return "text-orange-600";
+        case "moderately_severe":
+          return "text-red-600";
+        case "severe":
+          return "text-red-700";
+        default:
+          return "text-gray-600";
       }
     };
 
     return {
       level: result.level,
       score: result.score,
-      color: getStatusColor(result.level)
+      color: getStatusColor(result.level),
     };
   };
 
   const handleExportResults = () => {
     const results = Object.values(assessmentResults);
     if (results.length === 0) return;
-    
+
     const csvContent = exportAssessmentResults(results);
-    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const blob = new Blob([csvContent], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `assessment-results-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `assessment-results-${new Date().toISOString().split("T")[0]}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -159,7 +166,6 @@ export default function Assessments() {
           </p>
         </div>
 
-        {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="assessments">Assessments</TabsTrigger>
@@ -167,42 +173,43 @@ export default function Assessments() {
             <TabsTrigger value="insights">Insights</TabsTrigger>
           </TabsList>
 
+          {/* Assessments Tab */}
           <TabsContent value="assessments" className="space-y-6">
+            {/* Important Notice */}
+            <Card className="bg-blue-50 border-blue-200">
+              <CardContent className="pt-4">
+                <div className="flex items-start gap-3">
+                  <Shield className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h3 className="font-semibold text-blue-900 mb-1">Important Notice</h3>
+                    <p className="text-sm text-blue-800">
+                      These assessments are screening tools only and do not replace professional diagnosis. If you're
+                      experiencing a mental health crisis, please contact emergency services or a mental health
+                      professional immediately.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-        {/* Important Notice */}
-        <Card className="bg-blue-50 border-blue-200">
-          <CardContent className="pt-4">
-            <div className="flex items-start gap-3">
-              <Shield className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <h3 className="font-semibold text-blue-900 mb-1">Important Notice</h3>
-                <p className="text-sm text-blue-800">
-                  These assessments are screening tools only and do not replace professional diagnosis. 
-                  If you're experiencing a mental health crisis, please contact emergency services or a mental health professional immediately.
-                </p>
-              </div>
+            {/* Category Filter */}
+            <div className="flex flex-wrap gap-2">
+              {categories.map((category) => {
+                const Icon = category.icon;
+                return (
+                  <Button
+                    key={category.key}
+                    variant={selectedCategory === category.key ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSelectedCategory(category.key)}
+                    className="gap-2"
+                  >
+                    <Icon className="h-4 w-4" />
+                    {category.label}
+                  </Button>
+                );
+              })}
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Category Filter */}
-        <div className="flex flex-wrap gap-2">
-          {categories.map((category) => {
-            const Icon = category.icon;
-            return (
-              <Button
-                key={category.key}
-                variant={selectedCategory === category.key ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedCategory(category.key)}
-                className="gap-2"
-              >
-                <Icon className="h-4 w-4" />
-                {category.label}
-              </Button>
-            );
-          })}
-        </div>
 
             {/* Assessments Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -217,7 +224,7 @@ export default function Assessments() {
                   const color = assessmentColors[assessment.id as AssessmentType];
                   const bgColor = assessmentBgColors[assessment.id as AssessmentType];
                   const status = getAssessmentStatus(assessment.id as AssessmentType);
-                  
+
                   return (
                     <Card key={assessment.id} className="hover:shadow-md transition-shadow">
                       <CardHeader>
@@ -231,27 +238,27 @@ export default function Assessments() {
                               <p className="text-sm text-muted-foreground">{assessment.category}</p>
                             </div>
                           </div>
-                          {assessment.id === 'phq9' || assessment.id === 'gad7' ? (
+                          {(assessment.id === "phq9" || assessment.id === "gad7") && (
                             <Badge variant="secondary" className="gap-1">
                               <CheckCircle className="h-3 w-3" />
                               Recommended
                             </Badge>
-                          ) : null}
+                          )}
                         </div>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <p className="text-sm text-muted-foreground">{assessment.description}</p>
-                        
+
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <div className="flex items-center gap-1">
                             <Clock className="h-4 w-4" />
-                            {assessment.duration_minutes} minutes
+                            {assessment.duration_minutes || "5"} minutes
                           </div>
                           {status && (
                             <div className="flex items-center gap-1">
                               <BarChart3 className="h-4 w-4" />
                               <span className={status.color}>
-                                {status.level.replace('_', ' ')} ({status.score} points)
+                                {status.level.replace("_", " ")} ({status.score} points)
                               </span>
                             </div>
                           )}
@@ -259,16 +266,16 @@ export default function Assessments() {
 
                         {status ? (
                           <div className="space-y-2">
-                            <Button 
-                              variant="outline" 
+                            <Button
+                              variant="outline"
                               className="w-full"
                               onClick={() => setSelectedAssessment(assessment.id as AssessmentType)}
                             >
                               Retake Assessment
                             </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
+                            <Button
+                              variant="ghost"
+                              size="sm"
                               className="w-full"
                               onClick={() => setDetailedResultsAssessment(assessment.id as AssessmentType)}
                             >
@@ -276,7 +283,7 @@ export default function Assessments() {
                             </Button>
                           </div>
                         ) : (
-                          <Button 
+                          <Button
                             className="w-full"
                             onClick={() => setSelectedAssessment(assessment.id as AssessmentType)}
                           >
@@ -291,6 +298,7 @@ export default function Assessments() {
             </div>
           </TabsContent>
 
+          {/* History Tab */}
           <TabsContent value="history" className="space-y-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -302,7 +310,7 @@ export default function Assessments() {
                   </Button>
                 )}
               </div>
-              
+
               {assessmentHistory.length === 0 ? (
                 <Card>
                   <CardContent className="text-center py-8">
@@ -311,18 +319,16 @@ export default function Assessments() {
                     <p className="text-muted-foreground mb-4">
                       Complete your first assessment to see your progress here.
                     </p>
-                    <Button onClick={() => setActiveTab('assessments')}>
-                      Take Assessment
-                    </Button>
+                    <Button onClick={() => setActiveTab("assessments")}>Take Assessment</Button>
                   </CardContent>
                 </Card>
               ) : (
                 <div className="space-y-4">
-                  {assessmentHistory.map((result, index) => {
+                  {assessmentHistory.map((result) => {
                     const Icon = assessmentIcons[result.assessment_type];
                     const color = assessmentColors[result.assessment_type];
                     const bgColor = assessmentBgColors[result.assessment_type];
-                    
+
                     return (
                       <Card key={result.id}>
                         <CardContent className="pt-6">
@@ -340,24 +346,28 @@ export default function Assessments() {
                             </div>
                             <div className="text-right">
                               <div className="text-2xl font-bold">{result.score}</div>
-                              <Badge className={`${getAssessmentStatus(result.assessment_type)?.color || 'text-gray-600'}`}>
-                                {result.severity.replace('_', ' ')}
+                              <Badge
+                                className={`${
+                                  getAssessmentStatus(result.assessment_type)?.color || "text-gray-600"
+                                }`}
+                              >
+                                {result.severity.replace("_", " ")}
                               </Badge>
                             </div>
                           </div>
-                          
+
                           {result.previous_score !== undefined && (
                             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                               <TrendingUp className="h-4 w-4" />
                               <span>
-                                Previous: {result.previous_score} points
-                                {result.score_trend === 'improving' && ' (Improving)'}
-                                {result.score_trend === 'declining' && ' (Declining)'}
-                                {result.score_trend === 'stable' && ' (Stable)'}
+                                Previous: {result.previous_score} points{" "}
+                                {result.score_trend === "improving" && "(Improving)"}
+                                {result.score_trend === "declining" && "(Declining)"}
+                                {result.score_trend === "stable" && "(Stable)"}
                               </span>
                             </div>
                           )}
-                          
+
                           <p className="text-sm text-muted-foreground">{result.interpretation}</p>
                         </CardContent>
                       </Card>
@@ -368,10 +378,11 @@ export default function Assessments() {
             </div>
           </TabsContent>
 
+          {/* Insights Tab */}
           <TabsContent value="insights" className="space-y-6">
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Assessment Insights</h2>
-              
+
               {assessmentHistory.length === 0 ? (
                 <Card>
                   <CardContent className="text-center py-8">
@@ -380,9 +391,7 @@ export default function Assessments() {
                     <p className="text-muted-foreground mb-4">
                       Complete multiple assessments to see trends and insights.
                     </p>
-                    <Button onClick={() => setActiveTab('assessments')}>
-                      Take Assessment
-                    </Button>
+                    <Button onClick={() => setActiveTab("assessments")}>Take Assessment</Button>
                   </CardContent>
                 </Card>
               ) : (
@@ -413,7 +422,7 @@ export default function Assessments() {
                       </div>
                     </CardContent>
                   </Card>
-                  
+
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
@@ -423,13 +432,13 @@ export default function Assessments() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
-                        {assessmentHistory.slice(0, 3).map((result, index) => (
+                        {assessmentHistory.slice(0, 3).map((result) => (
                           <div key={result.id} className="flex justify-between items-center">
                             <span className="text-sm">{result.assessment_type.toUpperCase()}</span>
                             <div className="flex items-center gap-2">
                               <span className="text-sm font-medium">{result.score}</span>
                               <Badge variant="outline" className="text-xs">
-                                {result.severity.replace('_', ' ')}
+                                {result.severity.replace("_", " ")}
                               </Badge>
                             </div>
                           </div>
@@ -456,64 +465,4 @@ export default function Assessments() {
                 <div className="space-y-2">
                   <div className="text-sm">
                     <strong className="text-red-900">National Suicide Prevention Lifeline:</strong>
-                    <a href="tel:988" className="text-red-800 ml-2 font-semibold hover:underline">988</a>
-                  </div>
-                  <div className="text-sm">
-                    <strong className="text-red-900">Crisis Text Line:</strong>
-                    <a href="sms:741741&body=HOME" className="text-red-800 ml-2 font-semibold hover:underline">Text HOME to 741741</a>
-                  </div>
-                  <div className="text-sm">
-                    <strong className="text-red-900">Emergency Services:</strong>
-                    <a href="tel:911" className="text-red-800 ml-2 font-semibold hover:underline">911</a>
-                  </div>
-                  <div className="text-sm">
-                    <strong className="text-red-900">International Association for Suicide Prevention:</strong>
-                    <a href="https://www.iasp.info/resources/Crisis_Centres/" className="text-red-800 ml-2 font-semibold hover:underline" target="_blank" rel="noopener noreferrer">Find local resources</a>
-                  </div>
-                </div>
-                <div className="mt-4 p-3 bg-red-100 rounded-lg">
-                  <p className="text-xs text-red-800">
-                    <strong>Remember:</strong> These assessments are screening tools only and do not replace professional diagnosis. 
-                    If you're in immediate danger, call emergency services or go to your nearest emergency room.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Assessment Dialog */}
-      <Dialog open={!!selectedAssessment} onOpenChange={() => setSelectedAssessment(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {selectedAssessment && availableAssessments.find(a => a.id === selectedAssessment)?.name}
-            </DialogTitle>
-          </DialogHeader>
-          {selectedAssessment && (
-            <SelfAssessment
-              assessmentType={selectedAssessment}
-              onComplete={(result) => handleAssessmentComplete(selectedAssessment, result)}
-              onClose={() => setSelectedAssessment(null)}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Detailed Results Dialog */}
-      <Dialog open={!!detailedResultsAssessment} onOpenChange={() => setDetailedResultsAssessment(null)}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-          {detailedResultsAssessment && (
-            <AssessmentDetailedResults
-              assessmentType={detailedResultsAssessment}
-              onClose={() => setDetailedResultsAssessment(null)}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-
-      <BottomNav />
-    </div>
-  );
-}
+                    <a href="tel:988

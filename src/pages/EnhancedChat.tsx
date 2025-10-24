@@ -126,7 +126,7 @@ export default function EnhancedChat() {
       return {
         content: "I'm really concerned about what you're sharing. Your safety is the most important thing right now. Please reach out to a crisis helpline immediately:\n\n• National Suicide Prevention Lifeline: 988\n• Crisis Text Line: Text HOME to 741741\n• Emergency Services: 911\n\nYou don't have to go through this alone. There are people who want to help you right now.",
         type: 'crisis' as const,
-        suggestions: ['I need immediate help', 'I want to talk to someone', 'I'm feeling better now']
+        suggestions: ['I need immediate help', 'I want to talk to someone', 'I\'m feeling better now']
       };
     }
 
