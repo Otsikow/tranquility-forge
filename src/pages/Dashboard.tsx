@@ -7,16 +7,16 @@ import { MoodChart } from "@/components/MoodChart";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import PersonalizedDashboard from "@/components/PersonalizedDashboard";
 import OnboardingFlow from "@/components/OnboardingFlow";
-import { 
-  Leaf, 
-  BookOpen, 
-  Wind, 
-  MessageCircle, 
-  Settings, 
-  Heart, 
-  Users, 
-  Brain, 
-  Moon, 
+import {
+  Leaf,
+  BookOpen,
+  Wind,
+  MessageCircle,
+  Settings,
+  Heart,
+  Users,
+  Brain,
+  Moon,
   ClipboardList,
   Sparkles,
   Activity,
@@ -41,11 +41,14 @@ export default function Dashboard() {
     { day: "Sat", value: 9 },
     { day: "Sun", value: 8 },
   ]);
+
   const { profile, loading: profileLoading } = useUserProfile();
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
         navigate("/auth/login");
       } else {
@@ -63,8 +66,7 @@ export default function Dashboard() {
 
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
-    // Refresh profile data
-    window.location.reload();
+    window.location.reload(); // Refresh profile data
   };
 
   if (showOnboarding) {
@@ -73,7 +75,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Hero Section with Image */}
+      {/* Hero Section */}
       <div className="relative h-56 md:h-64 overflow-hidden">
         <img
           src={hummingbirdImage}
@@ -81,7 +83,7 @@ export default function Dashboard() {
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background" />
-        
+
         {/* Header Overlay */}
         <div className="absolute top-0 left-0 right-0 px-6 py-4 flex items-center justify-between backdrop-blur-sm bg-background/30">
           <div className="flex items-center gap-3">
@@ -92,14 +94,6 @@ export default function Dashboard() {
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate("/settings")}
-              className="text-foreground hover:text-foreground backdrop-blur-sm"
-            >
-              <Settings className="h-5 w-5" />
-            </Button>
           </div>
         </div>
 
@@ -114,6 +108,7 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Dashboard Content */}
       <div className="px-6 py-6 animate-fade-up max-w-4xl mx-auto">
         {profileLoading ? (
           <div className="flex items-center justify-center py-12">
@@ -127,7 +122,9 @@ export default function Dashboard() {
             <Card className="bg-muted border-border">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-card-foreground">Your Weekly Mood</CardTitle>
+                  <CardTitle className="text-card-foreground">
+                    Your Weekly Mood
+                  </CardTitle>
                   <div className="text-sm text-primary font-semibold">Up</div>
                 </div>
                 <p className="text-sm text-muted-foreground">Last 7 days +5%</p>
@@ -140,7 +137,9 @@ export default function Dashboard() {
             {/* Today's Affirmation */}
             <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="text-card-foreground">Today's Affirmation</CardTitle>
+                <CardTitle className="text-card-foreground">
+                  Today's Affirmation
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-card-foreground text-lg font-medium">
@@ -153,7 +152,9 @@ export default function Dashboard() {
             <Card className="bg-muted border-border">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-card-foreground">Recent Thoughts</CardTitle>
+                  <CardTitle className="text-card-foreground">
+                    Recent Thoughts
+                  </CardTitle>
                   <Button
                     variant="link"
                     className="text-primary p-0 h-auto"
@@ -170,7 +171,8 @@ export default function Dashboard() {
                   </div>
                   <div className="flex-1">
                     <p className="text-card-foreground text-sm">
-                      Today I felt a sense of calm during my morning walk. The sun was...
+                      Today I felt a sense of calm during my morning walk. The
+                      sun was...
                     </p>
                   </div>
                 </div>
@@ -179,8 +181,10 @@ export default function Dashboard() {
 
             {/* Quick Links */}
             <div className="space-y-6">
-              <h3 className="text-xl font-semibold text-foreground">Quick Access</h3>
-              
+              <h3 className="text-xl font-semibold text-foreground">
+                Quick Access
+              </h3>
+
               {/* Primary Actions */}
               <div className="grid grid-cols-2 gap-3">
                 <Button
@@ -216,6 +220,7 @@ export default function Dashboard() {
                   </div>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
+
                 <Button
                   size="lg"
                   variant="ghost"
@@ -228,6 +233,7 @@ export default function Dashboard() {
                   </div>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
+
                 <Button
                   size="lg"
                   variant="ghost"
@@ -240,6 +246,7 @@ export default function Dashboard() {
                   </div>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
+
                 <Button
                   size="lg"
                   variant="ghost"
@@ -252,6 +259,7 @@ export default function Dashboard() {
                   </div>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
+
                 <Button
                   size="lg"
                   variant="ghost"
