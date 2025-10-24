@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Crown, Star, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Check, Crown, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { UserSubscription, PremiumFeature, SubscriptionTier } from "@/types/db";
 import { BottomNav } from "@/components/BottomNav";
+import { AppBar } from "@/components/AppBar";
 
 const subscriptionPlans = [
   {
@@ -147,19 +147,7 @@ export default function Subscription() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <div className="bg-card border-b border-border px-6 py-4">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
-            <Link to="/settings">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-lg font-semibold">Subscription</h1>
-          </div>
-        </div>
-      </div>
+      <AppBar title="Subscription" showBack backTo="/settings" />
 
       <div className="px-6 py-6 space-y-6">
         {/* Current Plan */}

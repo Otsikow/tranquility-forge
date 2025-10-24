@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
-  ArrowLeft, 
   Heart, 
   MessageSquare, 
   Eye, 
@@ -18,6 +17,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import type { ForumPost, ForumReply, UsersProfile } from "@/types/db";
 import { BottomNav } from "@/components/BottomNav";
+import { AppBar } from "@/components/AppBar";
 
 export default function ForumPost() {
   const { id } = useParams<{ id: string }>();
@@ -166,25 +166,7 @@ export default function ForumPost() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <div className="bg-card border-b border-border px-6 py-4">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
-            <Link to="/community">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-lg font-semibold">Post</h1>
-          </div>
-          <Button variant="ghost" size="icon">
-            <Share2 className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon">
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+      <AppBar title="Post" showBack backTo="/community" />
 
       <div className="px-6 py-6 space-y-6">
         {/* Post */}
