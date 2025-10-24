@@ -19,14 +19,50 @@ export function InputBar({ disabled, onSubmit, onStop, isStreaming }: InputBarPr
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const chosenMimeTypeRef = useRef<string>("");
   const { toast } = useToast();
+
+  const getSupportedMimeType = (): string | null => {
+    if (typeof window === 'undefined' || typeof MediaRecorder === 'undefined') {
+      return null;
+    }
+    const candidates = [
+      'audio/webm;codecs=opus',
+      'audio/webm',
+      'audio/ogg;codecs=opus',
+      'audio/ogg',
+      'audio/mp4',
+      'audio/mpeg',
+      'audio/wav',
+    ];
+    for (const type of candidates) {
+      if ((MediaRecorder as any).isTypeSupported?.(type)) {
+        return type;
+      }
+    }
+    return '';
+  };
 
   const startRecording = async () => {
     try {
+      if (!navigator?.mediaDevices?.getUserMedia) {
+        toast({
+          title: "Recording not supported",
+          description: "Your browser doesn't support microphone access.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm',
-      });
+      const supportedType = getSupportedMimeType();
+      const options: MediaRecorderOptions = supportedType
+        ? { mimeType: supportedType }
+        : {};
+      const mediaRecorder = new MediaRecorder(stream, options);
+
+      // Keep track of actual mimeType chosen by the recorder
+      chosenMimeTypeRef.current = mediaRecorder.mimeType || supportedType || '';
 
       audioChunksRef.current = [];
 
@@ -37,8 +73,17 @@ export function InputBar({ disabled, onSubmit, onStop, isStreaming }: InputBarPr
       };
 
       mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        await transcribeAudio(audioBlob);
+        const mimeType = chosenMimeTypeRef.current || 'audio/webm';
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+        if (audioBlob.size === 0) {
+          toast({
+            title: "No audio captured",
+            description: "Please try recording again.",
+            variant: "destructive",
+          });
+        } else {
+          await transcribeAudio(audioBlob, mimeType);
+        }
         
         // Stop all tracks
         stream.getTracks().forEach(track => track.stop());
@@ -51,8 +96,10 @@ export function InputBar({ disabled, onSubmit, onStop, isStreaming }: InputBarPr
     } catch (err) {
       console.error('Microphone access error:', err);
       toast({
-        title: "Microphone access denied",
-        description: "Please allow microphone access to use voice input.",
+        title: "Microphone access error",
+        description: err instanceof Error
+          ? err.message
+          : "Please allow access or try a different browser.",
         variant: "destructive",
       });
     }
@@ -65,7 +112,7 @@ export function InputBar({ disabled, onSubmit, onStop, isStreaming }: InputBarPr
     }
   };
 
-  const transcribeAudio = async (audioBlob: Blob) => {
+  const transcribeAudio = async (audioBlob: Blob, mimeType: string) => {
     setIsTranscribing(true);
     
     try {
@@ -82,11 +129,11 @@ export function InputBar({ disabled, onSubmit, onStop, isStreaming }: InputBarPr
       reader.readAsDataURL(audioBlob);
       const base64Audio = await base64Promise;
 
-      console.log('Sending audio for transcription, size:', audioBlob.size);
+      console.log('Sending audio for transcription, size:', audioBlob.size, 'type:', mimeType);
 
       // Call edge function
       const { data, error } = await supabase.functions.invoke('transcribe-audio', {
-        body: { audio: base64Audio },
+        body: { audio: base64Audio, mimeType },
       });
 
       if (error) {
@@ -107,7 +154,7 @@ export function InputBar({ disabled, onSubmit, onStop, isStreaming }: InputBarPr
       console.error('Transcription error:', error);
       toast({
         title: "Transcription failed",
-        description: "Could not transcribe audio. Please try typing instead.",
+        description: "Could not transcribe audio. Your browser format may be unsupported.",
         variant: "destructive",
       });
     } finally {
