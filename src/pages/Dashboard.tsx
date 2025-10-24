@@ -162,6 +162,53 @@ export default function Dashboard() {
             Talk to Peace
           </Button>
         </div>
+
+        {/* New Features Grid */}
+        <div className="grid grid-cols-2 gap-3 pt-4">
+          <Card 
+            className="hover:shadow-lg transition-all duration-200 cursor-pointer"
+            onClick={() => navigate("/assessments")}
+          >
+            <CardContent className="pt-6 pb-4 text-center">
+              <div className="text-3xl mb-2">📊</div>
+              <p className="font-medium text-sm">Assessments</p>
+              <p className="text-xs text-muted-foreground mt-1">Track your progress</p>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className="hover:shadow-lg transition-all duration-200 cursor-pointer"
+            onClick={() => navigate("/cbt")}
+          >
+            <CardContent className="pt-6 pb-4 text-center">
+              <div className="text-3xl mb-2">🧠</div>
+              <p className="font-medium text-sm">CBT Tools</p>
+              <p className="text-xs text-muted-foreground mt-1">Cognitive exercises</p>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className="hover:shadow-lg transition-all duration-200 cursor-pointer"
+            onClick={() => navigate("/sleep")}
+          >
+            <CardContent className="pt-6 pb-4 text-center">
+              <div className="text-3xl mb-2">😴</div>
+              <p className="font-medium text-sm">Sleep</p>
+              <p className="text-xs text-muted-foreground mt-1">Rest better tonight</p>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className="hover:shadow-lg transition-all duration-200 cursor-pointer"
+            onClick={() => navigate("/learn")}
+          >
+            <CardContent className="pt-6 pb-4 text-center">
+              <div className="text-3xl mb-2">📚</div>
+              <p className="font-medium text-sm">Learn</p>
+              <p className="text-xs text-muted-foreground mt-1">Mental health resources</p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       <BottomNav />

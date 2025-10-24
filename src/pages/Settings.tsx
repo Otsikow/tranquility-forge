@@ -1,9 +1,40 @@
 import { AppBar } from "@/components/AppBar";
 import { BottomNav } from "@/components/BottomNav";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronRight, User, Bell, HelpCircle, Info, FileText, Shield } from "lucide-react";
+import { ChevronRight, User, Bell, HelpCircle, Info, FileText, Shield, Brain, AlertCircle, BookOpen, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import banffImage from "@/assets/banff-lake.jpg";
+
+const featureSections = [
+  {
+    title: "Mental Health Tools",
+    description: "Access assessments and CBT exercises",
+    icon: Brain,
+    path: "/assessments",
+    color: "text-purple-500",
+  },
+  {
+    title: "Crisis Resources",
+    description: "Emergency support when you need it",
+    icon: AlertCircle,
+    path: "/crisis",
+    color: "text-red-500",
+  },
+  {
+    title: "Learning Center",
+    description: "Educational articles and resources",
+    icon: BookOpen,
+    path: "/learn",
+    color: "text-blue-500",
+  },
+  {
+    title: "Community",
+    description: "Connect with others on their journey",
+    icon: Users,
+    path: "/community",
+    color: "text-green-500",
+  },
+];
 
 const settingsSections = [
   {
@@ -66,36 +97,72 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* Settings List */}
-      <div className="px-6 py-6 space-y-3 max-w-4xl mx-auto">
-        {settingsSections.map((section, index) => {
-          const Icon = section.icon;
-          return (
-            <Link key={section.path} to={section.path}>
-              <Card 
-                className="hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 animate-fade-in"
-                style={{ animationDelay: `${index * 0.05}s` }}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-4">
-                    <div className="bg-primary/10 rounded-full p-3">
-                      <Icon className={`w-6 h-6 ${section.color}`} />
+      <div className="px-6 py-6 space-y-6 max-w-4xl mx-auto">
+        {/* Features Section */}
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold px-1">Features</h3>
+          {featureSections.map((section, index) => {
+            const Icon = section.icon;
+            return (
+              <Link key={section.path} to={section.path}>
+                <Card 
+                  className="hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 animate-fade-in"
+                  style={{ animationDelay: `${index * 0.05}s` }}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-muted rounded-full p-3">
+                        <Icon className={`w-6 h-6 ${section.color}`} />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-foreground mb-0.5">
+                          {section.title}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          {section.description}
+                        </p>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
                     </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-foreground mb-0.5">
-                        {section.title}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        {section.description}
-                      </p>
+                  </CardContent>
+                </Card>
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Settings Section */}
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold px-1">Settings</h3>
+          {settingsSections.map((section, index) => {
+            const Icon = section.icon;
+            return (
+              <Link key={section.path} to={section.path}>
+                <Card 
+                  className="hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 animate-fade-in"
+                  style={{ animationDelay: `${index * 0.05}s` }}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-primary/10 rounded-full p-3">
+                        <Icon className={`w-6 h-6 ${section.color}`} />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-foreground mb-0.5">
+                          {section.title}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          {section.description}
+                        </p>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
                     </div>
-                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          );
-        })}
+                  </CardContent>
+                </Card>
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
       <BottomNav />
