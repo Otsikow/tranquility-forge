@@ -10,7 +10,7 @@ export default function Breathe() {
 
   return (
     <div className="min-h-screen bg-card pb-20 relative overflow-hidden">
-      <AppBar title="Breathing Exercise" />
+      <AppBar title="Breathing Exercise" showBack backTo="/dashboard" />
       
       {/* Background Image */}
       <div className="absolute inset-0 z-0">

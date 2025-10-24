@@ -17,7 +17,8 @@ import {
   Pin,
   Brain,
   ClipboardList,
-  ArrowRight
+  ArrowRight,
+  ArrowLeft
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ForumCategory, ForumPost, UsersProfile } from "@/types/db";
@@ -113,9 +114,16 @@ export default function Community() {
       {/* Header */}
       <div className="bg-card border-b border-border px-6 py-4">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Community</h1>
-            <p className="text-muted-foreground">Connect with others on their wellness journey</p>
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/dashboard">
+                <ArrowLeft className="h-4 w-4" />
+              </Link>
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Community</h1>
+              <p className="text-muted-foreground">Connect with others on their wellness journey</p>
+            </div>
           </div>
           <Button asChild>
             <Link to="/community/new-post">

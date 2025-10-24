@@ -77,7 +77,7 @@ export default function Journal() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <AppBar title="My Journal" showBack={false} />
+      <AppBar title="My Journal" showBack backTo="/dashboard" />
 
       {/* Hero Section */}
       <div className="relative h-44 md:h-56 overflow-hidden">

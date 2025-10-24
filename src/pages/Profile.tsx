@@ -20,7 +20,7 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-card pb-20">
-      <AppBar title="Profile" showBack={false} />
+      <AppBar title="Profile" showBack backTo="/dashboard" />
       
       <div className="px-6 py-8 space-y-8 max-w-2xl mx-auto">
         <Card className="bg-muted border-border">

@@ -19,7 +19,7 @@ export default function Meditations() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <AppBar title="Meditations" showBack={false} />
+      <AppBar title="Meditations" showBack backTo="/dashboard" />
 
       {/* Hero Section */}
       <div className="relative h-48 md:h-56 overflow-hidden">

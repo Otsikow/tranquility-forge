@@ -13,7 +13,8 @@ import {
   Clock,
   Star,
   Lock,
-  CheckCircle
+  CheckCircle,
+  ArrowLeft
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { CBTCategory, CBTExercise, CBTProgress } from "@/types/db";
@@ -119,9 +120,16 @@ export default function CBTTools() {
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
       <div className="bg-card border-b border-border px-6 py-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">CBT Tools</h1>
-          <p className="text-muted-foreground">Evidence-based exercises for mental wellness</p>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/dashboard">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">CBT Tools</h1>
+            <p className="text-muted-foreground">Evidence-based exercises for mental wellness</p>
+          </div>
         </div>
       </div>
 
