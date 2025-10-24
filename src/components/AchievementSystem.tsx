@@ -17,7 +17,8 @@ import {
   Leaf,
   Calendar,
   TrendingUp,
-  CheckCircle
+  CheckCircle,
+  Moon
 } from "lucide-react";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import type { UserAchievement } from "@/types/db";

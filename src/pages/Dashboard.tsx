@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BottomNav } from "@/components/BottomNav";
 import { MoodChart } from "@/components/MoodChart";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
+import PersonalizedDashboard from "@/components/PersonalizedDashboard";
 import OnboardingFlow from "@/components/OnboardingFlow";
 import { Leaf, BookOpen, Wind, MessageCircle, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";

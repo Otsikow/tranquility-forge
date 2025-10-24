@@ -32,7 +32,7 @@ interface AssessmentQuestion {
   }[];
 }
 
-interface AssessmentResult {
+export interface AssessmentResult {
   score: number;
   level: 'minimal' | 'mild' | 'moderate' | 'moderately_severe' | 'severe';
   interpretation: string;

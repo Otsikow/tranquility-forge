@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { AppBar } from "@/components/AppBar";
 import { BottomNav } from "@/components/BottomNav";
-import { EnhancedMoodTracker } from "@/components/EnhancedMoodTracker";
-import { AchievementSystem } from "@/components/AchievementSystem";
+import EnhancedMoodTracker from "@/components/EnhancedMoodTracker";
+import AchievementSystem from "@/components/AchievementSystem";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Heart, Trophy, BarChart3 } from "lucide-react";
 
