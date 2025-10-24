@@ -90,7 +90,16 @@ export function InputBar({ disabled, onSubmit, onStop, isStreaming }: InputBarPr
       });
 
       if (error) {
-        throw error;
+        console.error('Supabase function error:', error);
+        
+        // Provide more specific error messages
+        if (error.message?.includes('not found') || error.message?.includes('404')) {
+          throw new Error('Voice transcription service is not deployed. Please contact support.');
+        } else if (error.message?.includes('OPENAI_API_KEY')) {
+          throw new Error('Voice transcription is not configured. Please contact support.');
+        } else {
+          throw new Error(error.message || 'Transcription service error');
+        }
       }
 
       if (data?.text) {
@@ -99,15 +108,19 @@ export function InputBar({ disabled, onSubmit, onStop, isStreaming }: InputBarPr
           title: "Transcription complete",
           description: "Your voice has been converted to text.",
         });
+      } else if (data?.error) {
+        throw new Error(data.error);
       } else {
-        throw new Error('No transcription received');
+        throw new Error('No transcription received from service');
       }
 
     } catch (error) {
       console.error('Transcription error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      
       toast({
         title: "Transcription failed",
-        description: "Could not transcribe audio. Please try typing instead.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
