@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AppBar } from "@/components/AppBar";
 import { BottomNav } from "@/components/BottomNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Brain, 
   Heart, 
@@ -14,61 +15,43 @@ import {
   AlertTriangle,
   CheckCircle,
   BarChart3,
-  BookOpen
+  BookOpen,
+  Download,
+  TrendingUp,
+  Calendar,
+  FileText
 } from "lucide-react";
 import SelfAssessment from "@/components/SelfAssessment";
+import AssessmentDetailedResults from "@/components/AssessmentDetailedResults";
 import type { AssessmentResult } from "@/components/SelfAssessment";
+import { 
+  getAvailableAssessments, 
+  getAssessmentHistoryWithInsights,
+  exportAssessmentResults,
+  type AssessmentType,
+  type AssessmentResultWithInsights
+} from "@/lib/assessmentService";
 
-const availableAssessments = [
-  {
-    id: 'phq9',
-    name: 'PHQ-9 Depression Screening',
-    description: 'A validated 9-question screening tool for depression',
-    duration: '5-10 minutes',
-    icon: Heart,
-    color: 'text-blue-500',
-    bgColor: 'bg-blue-100',
-    category: 'Mental Health',
-    lastTaken: null,
-    recommended: true
-  },
-  {
-    id: 'gad7',
-    name: 'GAD-7 Anxiety Screening',
-    description: 'A validated 7-question screening tool for anxiety',
-    duration: '3-5 minutes',
-    icon: Brain,
-    color: 'text-purple-500',
-    bgColor: 'bg-purple-100',
-    category: 'Mental Health',
-    lastTaken: null,
-    recommended: true
-  },
-  {
-    id: 'pss10',
-    name: 'PSS-10 Stress Scale',
-    description: 'A 10-question scale to measure perceived stress',
-    duration: '5 minutes',
-    icon: Target,
-    color: 'text-orange-500',
-    bgColor: 'bg-orange-100',
-    category: 'Stress',
-    lastTaken: null,
-    recommended: false
-  },
-  {
-    id: 'sleep_hygiene',
-    name: 'Sleep Hygiene Assessment',
-    description: 'Evaluate your sleep habits and quality',
-    duration: '3-5 minutes',
-    icon: Clock,
-    color: 'text-indigo-500',
-    bgColor: 'bg-indigo-100',
-    category: 'Sleep',
-    lastTaken: null,
-    recommended: false
-  }
-];
+const assessmentIcons = {
+  phq9: Heart,
+  gad7: Brain,
+  pss10: Target,
+  sleep_hygiene: Clock
+};
+
+const assessmentColors = {
+  phq9: 'text-blue-500',
+  gad7: 'text-purple-500',
+  pss10: 'text-orange-500',
+  sleep_hygiene: 'text-indigo-500'
+};
+
+const assessmentBgColors = {
+  phq9: 'bg-blue-100',
+  gad7: 'bg-purple-100',
+  pss10: 'bg-orange-100',
+  sleep_hygiene: 'bg-indigo-100'
+};
 
 const categories = [
   { key: 'all', label: 'All Assessments', icon: BarChart3 },
@@ -78,20 +61,54 @@ const categories = [
 ];
 
 export default function Assessments() {
-  const [selectedAssessment, setSelectedAssessment] = useState<string | null>(null);
+  const [selectedAssessment, setSelectedAssessment] = useState<AssessmentType | null>(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [assessmentResults, setAssessmentResults] = useState<Record<string, AssessmentResult>>({});
+  const [availableAssessments, setAvailableAssessments] = useState<any[]>([]);
+  const [assessmentHistory, setAssessmentHistory] = useState<AssessmentResultWithInsights[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('assessments');
+  const [detailedResultsAssessment, setDetailedResultsAssessment] = useState<AssessmentType | null>(null);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        const [assessments, history] = await Promise.all([
+          getAvailableAssessments(),
+          getAssessmentHistoryWithInsights('phq9', 5) // Load recent PHQ-9 results as example
+        ]);
+        
+        setAvailableAssessments(assessments);
+        setAssessmentHistory(history);
+      } catch (error) {
+        console.error('Error loading assessment data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
 
   const filteredAssessments = selectedCategory === 'all' 
     ? availableAssessments 
     : availableAssessments.filter(a => a.category === selectedCategory);
 
-  const handleAssessmentComplete = (assessmentId: string, result: AssessmentResult) => {
+  const handleAssessmentComplete = async (assessmentId: AssessmentType, result: AssessmentResult) => {
     setAssessmentResults(prev => ({ ...prev, [assessmentId]: result }));
     setSelectedAssessment(null);
+    
+    // Refresh history
+    try {
+      const history = await getAssessmentHistoryWithInsights(assessmentId, 5);
+      setAssessmentHistory(prev => [...history, ...prev.filter(h => h.assessment_type !== assessmentId)]);
+    } catch (error) {
+      console.error('Error refreshing assessment history:', error);
+    }
   };
 
-  const getAssessmentStatus = (assessmentId: string) => {
+  const getAssessmentStatus = (assessmentId: AssessmentType) => {
     const result = assessmentResults[assessmentId];
     if (!result) return null;
     
@@ -113,6 +130,22 @@ export default function Assessments() {
     };
   };
 
+  const handleExportResults = () => {
+    const results = Object.values(assessmentResults);
+    if (results.length === 0) return;
+    
+    const csvContent = exportAssessmentResults(results);
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `assessment-results-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="min-h-screen bg-background pb-20">
       <AppBar title="Mental Health Assessments" showBack={false} />
@@ -125,6 +158,16 @@ export default function Assessments() {
             Take validated mental health screenings to better understand your wellbeing
           </p>
         </div>
+
+        {/* Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="assessments">Assessments</TabsTrigger>
+            <TabsTrigger value="history">History</TabsTrigger>
+            <TabsTrigger value="insights">Insights</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="assessments" className="space-y-6">
 
         {/* Important Notice */}
         <Card className="bg-blue-50 border-blue-200">
@@ -161,85 +204,244 @@ export default function Assessments() {
           })}
         </div>
 
-        {/* Assessments Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredAssessments.map((assessment) => {
-            const Icon = assessment.icon;
-            const status = getAssessmentStatus(assessment.id);
-            
-            return (
-              <Card key={assessment.id} className="hover:shadow-md transition-shadow">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${assessment.bgColor}`}>
-                        <Icon className={`h-6 w-6 ${assessment.color}`} />
-                      </div>
-                      <div>
-                        <CardTitle className="text-lg">{assessment.name}</CardTitle>
-                        <p className="text-sm text-muted-foreground">{assessment.category}</p>
-                      </div>
-                    </div>
-                    {assessment.recommended && (
-                      <Badge variant="secondary" className="gap-1">
-                        <CheckCircle className="h-3 w-3" />
-                        Recommended
-                      </Badge>
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-sm text-muted-foreground">{assessment.description}</p>
+            {/* Assessments Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {isLoading ? (
+                <div className="col-span-2 text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                  <p className="text-muted-foreground mt-2">Loading assessments...</p>
+                </div>
+              ) : (
+                filteredAssessments.map((assessment) => {
+                  const Icon = assessmentIcons[assessment.id as AssessmentType];
+                  const color = assessmentColors[assessment.id as AssessmentType];
+                  const bgColor = assessmentBgColors[assessment.id as AssessmentType];
+                  const status = getAssessmentStatus(assessment.id as AssessmentType);
                   
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      {assessment.duration}
-                    </div>
-                    {status && (
-                      <div className="flex items-center gap-1">
-                        <BarChart3 className="h-4 w-4" />
-                        <span className={status.color}>
-                          {status.level.replace('_', ' ')} ({status.score} points)
-                        </span>
-                      </div>
-                    )}
-                  </div>
+                  return (
+                    <Card key={assessment.id} className="hover:shadow-md transition-shadow">
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className={`p-2 rounded-lg ${bgColor}`}>
+                              <Icon className={`h-6 w-6 ${color}`} />
+                            </div>
+                            <div>
+                              <CardTitle className="text-lg">{assessment.name}</CardTitle>
+                              <p className="text-sm text-muted-foreground">{assessment.category}</p>
+                            </div>
+                          </div>
+                          {assessment.id === 'phq9' || assessment.id === 'gad7' ? (
+                            <Badge variant="secondary" className="gap-1">
+                              <CheckCircle className="h-3 w-3" />
+                              Recommended
+                            </Badge>
+                          ) : null}
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <p className="text-sm text-muted-foreground">{assessment.description}</p>
+                        
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-4 w-4" />
+                            {assessment.duration_minutes} minutes
+                          </div>
+                          {status && (
+                            <div className="flex items-center gap-1">
+                              <BarChart3 className="h-4 w-4" />
+                              <span className={status.color}>
+                                {status.level.replace('_', ' ')} ({status.score} points)
+                              </span>
+                            </div>
+                          )}
+                        </div>
 
-                  {status ? (
-                    <div className="space-y-2">
-                      <Button 
-                        variant="outline" 
-                        className="w-full"
-                        onClick={() => setSelectedAssessment(assessment.id)}
-                      >
-                        Retake Assessment
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="w-full"
-                        onClick={() => {
-                          // Show detailed results
-                          console.log('Show results for', assessment.id);
-                        }}
-                      >
-                        View Detailed Results
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button 
-                      className="w-full"
-                      onClick={() => setSelectedAssessment(assessment.id)}
-                    >
-                      Start Assessment
+                        {status ? (
+                          <div className="space-y-2">
+                            <Button 
+                              variant="outline" 
+                              className="w-full"
+                              onClick={() => setSelectedAssessment(assessment.id as AssessmentType)}
+                            >
+                              Retake Assessment
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="w-full"
+                              onClick={() => setDetailedResultsAssessment(assessment.id as AssessmentType)}
+                            >
+                              View Detailed Results
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button 
+                            className="w-full"
+                            onClick={() => setSelectedAssessment(assessment.id as AssessmentType)}
+                          >
+                            Start Assessment
+                          </Button>
+                        )}
+                      </CardContent>
+                    </Card>
+                  );
+                })
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="history" className="space-y-6">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold">Assessment History</h2>
+                {assessmentHistory.length > 0 && (
+                  <Button variant="outline" size="sm" onClick={handleExportResults}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Export
+                  </Button>
+                )}
+              </div>
+              
+              {assessmentHistory.length === 0 ? (
+                <Card>
+                  <CardContent className="text-center py-8">
+                    <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">No Assessment History</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Complete your first assessment to see your progress here.
+                    </p>
+                    <Button onClick={() => setActiveTab('assessments')}>
+                      Take Assessment
                     </Button>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-4">
+                  {assessmentHistory.map((result, index) => {
+                    const Icon = assessmentIcons[result.assessment_type];
+                    const color = assessmentColors[result.assessment_type];
+                    const bgColor = assessmentBgColors[result.assessment_type];
+                    
+                    return (
+                      <Card key={result.id}>
+                        <CardContent className="pt-6">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className={`p-2 rounded-lg ${bgColor}`}>
+                                <Icon className={`h-5 w-5 ${color}`} />
+                              </div>
+                              <div>
+                                <h3 className="font-semibold">{result.assessment_type.toUpperCase()}</h3>
+                                <p className="text-sm text-muted-foreground">
+                                  {new Date(result.completed_at).toLocaleDateString()}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-2xl font-bold">{result.score}</div>
+                              <Badge className={`${getAssessmentStatus(result.assessment_type)?.color || 'text-gray-600'}`}>
+                                {result.severity.replace('_', ' ')}
+                              </Badge>
+                            </div>
+                          </div>
+                          
+                          {result.previous_score !== undefined && (
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                              <TrendingUp className="h-4 w-4" />
+                              <span>
+                                Previous: {result.previous_score} points
+                                {result.score_trend === 'improving' && ' (Improving)'}
+                                {result.score_trend === 'declining' && ' (Declining)'}
+                                {result.score_trend === 'stable' && ' (Stable)'}
+                              </span>
+                            </div>
+                          )}
+                          
+                          <p className="text-sm text-muted-foreground">{result.interpretation}</p>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="insights" className="space-y-6">
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Assessment Insights</h2>
+              
+              {assessmentHistory.length === 0 ? (
+                <Card>
+                  <CardContent className="text-center py-8">
+                    <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">No Insights Available</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Complete multiple assessments to see trends and insights.
+                    </p>
+                    <Button onClick={() => setActiveTab('assessments')}>
+                      Take Assessment
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <TrendingUp className="h-5 w-5" />
+                        Progress Overview
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Total Assessments</span>
+                          <span className="font-semibold">{assessmentHistory.length}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Latest Score</span>
+                          <span className="font-semibold">{assessmentHistory[0]?.score}</span>
+                        </div>
+                        {assessmentHistory[0]?.previous_score && (
+                          <div className="flex justify-between">
+                            <span className="text-sm text-muted-foreground">Previous Score</span>
+                            <span className="font-semibold">{assessmentHistory[0].previous_score}</span>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Calendar className="h-5 w-5" />
+                        Recent Activity
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        {assessmentHistory.slice(0, 3).map((result, index) => (
+                          <div key={result.id} className="flex justify-between items-center">
+                            <span className="text-sm">{result.assessment_type.toUpperCase()}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium">{result.score}</span>
+                              <Badge variant="outline" className="text-xs">
+                                {result.severity.replace('_', ' ')}
+                              </Badge>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
 
         {/* Crisis Resources */}
         <Card className="bg-red-50 border-red-200">
@@ -254,16 +456,26 @@ export default function Assessments() {
                 <div className="space-y-2">
                   <div className="text-sm">
                     <strong className="text-red-900">National Suicide Prevention Lifeline:</strong>
-                    <span className="text-red-800 ml-2">988</span>
+                    <a href="tel:988" className="text-red-800 ml-2 font-semibold hover:underline">988</a>
                   </div>
                   <div className="text-sm">
                     <strong className="text-red-900">Crisis Text Line:</strong>
-                    <span className="text-red-800 ml-2">Text HOME to 741741</span>
+                    <a href="sms:741741&body=HOME" className="text-red-800 ml-2 font-semibold hover:underline">Text HOME to 741741</a>
                   </div>
                   <div className="text-sm">
                     <strong className="text-red-900">Emergency Services:</strong>
-                    <span className="text-red-800 ml-2">911</span>
+                    <a href="tel:911" className="text-red-800 ml-2 font-semibold hover:underline">911</a>
                   </div>
+                  <div className="text-sm">
+                    <strong className="text-red-900">International Association for Suicide Prevention:</strong>
+                    <a href="https://www.iasp.info/resources/Crisis_Centres/" className="text-red-800 ml-2 font-semibold hover:underline" target="_blank" rel="noopener noreferrer">Find local resources</a>
+                  </div>
+                </div>
+                <div className="mt-4 p-3 bg-red-100 rounded-lg">
+                  <p className="text-xs text-red-800">
+                    <strong>Remember:</strong> These assessments are screening tools only and do not replace professional diagnosis. 
+                    If you're in immediate danger, call emergency services or go to your nearest emergency room.
+                  </p>
                 </div>
               </div>
             </div>
@@ -281,9 +493,21 @@ export default function Assessments() {
           </DialogHeader>
           {selectedAssessment && (
             <SelfAssessment
-              assessmentType={selectedAssessment as 'phq9' | 'gad7'}
+              assessmentType={selectedAssessment}
               onComplete={(result) => handleAssessmentComplete(selectedAssessment, result)}
               onClose={() => setSelectedAssessment(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Detailed Results Dialog */}
+      <Dialog open={!!detailedResultsAssessment} onOpenChange={() => setDetailedResultsAssessment(null)}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          {detailedResultsAssessment && (
+            <AssessmentDetailedResults
+              assessmentType={detailedResultsAssessment}
+              onClose={() => setDetailedResultsAssessment(null)}
             />
           )}
         </DialogContent>

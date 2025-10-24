@@ -21,212 +21,41 @@ import {
   TrendingUp
 } from "lucide-react";
 import { useUserProfile } from "@/hooks/useUserProfile";
-
-interface AssessmentQuestion {
-  id: string;
-  text: string;
-  options: {
-    value: number;
-    label: string;
-    description?: string;
-  }[];
-}
+import { 
+  assessmentDefinitions, 
+  calculateSeverity, 
+  generateInterpretation,
+  saveAssessmentProgress,
+  getAssessmentProgress,
+  completeAssessment,
+  type AssessmentType,
+  type AssessmentSeverity
+} from "@/lib/assessmentService";
 
 export interface AssessmentResult {
   score: number;
-  level: 'minimal' | 'mild' | 'moderate' | 'moderately_severe' | 'severe';
+  level: AssessmentSeverity;
   interpretation: string;
   recommendations: string[];
   resources: string[];
 }
 
-const PHQ9Questions: AssessmentQuestion[] = [
-  {
-    id: "interest",
-    text: "Little interest or pleasure in doing things",
-    options: [
-      { value: 0, label: "Not at all" },
-      { value: 1, label: "Several days" },
-      { value: 2, label: "More than half the days" },
-      { value: 3, label: "Nearly every day" }
-    ]
-  },
-  {
-    id: "mood",
-    text: "Feeling down, depressed, or hopeless",
-    options: [
-      { value: 0, label: "Not at all" },
-      { value: 1, label: "Several days" },
-      { value: 2, label: "More than half the days" },
-      { value: 3, label: "Nearly every day" }
-    ]
-  },
-  {
-    id: "sleep",
-    text: "Trouble falling or staying asleep, or sleeping too much",
-    options: [
-      { value: 0, label: "Not at all" },
-      { value: 1, label: "Several days" },
-      { value: 2, label: "More than half the days" },
-      { value: 3, label: "Nearly every day" }
-    ]
-  },
-  {
-    id: "energy",
-    text: "Feeling tired or having little energy",
-    options: [
-      { value: 0, label: "Not at all" },
-      { value: 1, label: "Several days" },
-      { value: 2, label: "More than half the days" },
-      { value: 3, label: "Nearly every day" }
-    ]
-  },
-  {
-    id: "appetite",
-    text: "Poor appetite or overeating",
-    options: [
-      { value: 0, label: "Not at all" },
-      { value: 1, label: "Several days" },
-      { value: 2, label: "More than half the days" },
-      { value: 3, label: "Nearly every day" }
-    ]
-  },
-  {
-    id: "self_esteem",
-    text: "Feeling bad about yourself - or that you are a failure or have let yourself or your family down",
-    options: [
-      { value: 0, label: "Not at all" },
-      { value: 1, label: "Several days" },
-      { value: 2, label: "More than half the days" },
-      { value: 3, label: "Nearly every day" }
-    ]
-  },
-  {
-    id: "concentration",
-    text: "Trouble concentrating on things, such as reading the newspaper or watching television",
-    options: [
-      { value: 0, label: "Not at all" },
-      { value: 1, label: "Several days" },
-      { value: 2, label: "More than half the days" },
-      { value: 3, label: "Nearly every day" }
-    ]
-  },
-  {
-    id: "movement",
-    text: "Moving or speaking so slowly that other people could have noticed, or the opposite - being so fidgety or restless that you have been moving around a lot more than usual",
-    options: [
-      { value: 0, label: "Not at all" },
-      { value: 1, label: "Several days" },
-      { value: 2, label: "More than half the days" },
-      { value: 3, label: "Nearly every day" }
-    ]
-  },
-  {
-    id: "suicidal",
-    text: "Thoughts that you would be better off dead, or of hurting yourself",
-    options: [
-      { value: 0, label: "Not at all" },
-      { value: 1, label: "Several days" },
-      { value: 2, label: "More than half the days" },
-      { value: 3, label: "Nearly every day" }
-    ]
-  }
-];
+const assessmentIcons = {
+  phq9: Heart,
+  gad7: Brain,
+  pss10: Target,
+  sleep_hygiene: Moon
+};
 
-const GAD7Questions: AssessmentQuestion[] = [
-  {
-    id: "nervous",
-    text: "Feeling nervous, anxious, or on edge",
-    options: [
-      { value: 0, label: "Not at all" },
-      { value: 1, label: "Several days" },
-      { value: 2, label: "More than half the days" },
-      { value: 3, label: "Nearly every day" }
-    ]
-  },
-  {
-    id: "worry",
-    text: "Not being able to stop or control worrying",
-    options: [
-      { value: 0, label: "Not at all" },
-      { value: 1, label: "Several days" },
-      { value: 2, label: "More than half the days" },
-      { value: 3, label: "Nearly every day" }
-    ]
-  },
-  {
-    id: "worry_excessive",
-    text: "Worrying too much about different things",
-    options: [
-      { value: 0, label: "Not at all" },
-      { value: 1, label: "Several days" },
-      { value: 2, label: "More than half the days" },
-      { value: 3, label: "Nearly every day" }
-    ]
-  },
-  {
-    id: "trouble_relaxing",
-    text: "Trouble relaxing",
-    options: [
-      { value: 0, label: "Not at all" },
-      { value: 1, label: "Several days" },
-      { value: 2, label: "More than half the days" },
-      { value: 3, label: "Nearly every day" }
-    ]
-  },
-  {
-    id: "restless",
-    text: "Being so restless that it's hard to sit still",
-    options: [
-      { value: 0, label: "Not at all" },
-      { value: 1, label: "Several days" },
-      { value: 2, label: "More than half the days" },
-      { value: 3, label: "Nearly every day" }
-    ]
-  },
-  {
-    id: "irritable",
-    text: "Becoming easily annoyed or irritable",
-    options: [
-      { value: 0, label: "Not at all" },
-      { value: 1, label: "Several days" },
-      { value: 2, label: "More than half the days" },
-      { value: 3, label: "Nearly every day" }
-    ]
-  },
-  {
-    id: "afraid",
-    text: "Feeling afraid as if something awful might happen",
-    options: [
-      { value: 0, label: "Not at all" },
-      { value: 1, label: "Several days" },
-      { value: 2, label: "More than half the days" },
-      { value: 3, label: "Nearly every day" }
-    ]
-  }
-];
-
-const assessments = {
-  phq9: {
-    name: "PHQ-9 Depression Screening",
-    description: "A 9-question screening tool for depression",
-    icon: Heart,
-    color: "text-blue-500",
-    questions: PHQ9Questions,
-    maxScore: 27
-  },
-  gad7: {
-    name: "GAD-7 Anxiety Screening", 
-    description: "A 7-question screening tool for anxiety",
-    icon: Brain,
-    color: "text-purple-500",
-    questions: GAD7Questions,
-    maxScore: 21
-  }
+const assessmentColors = {
+  phq9: "text-blue-500",
+  gad7: "text-purple-500", 
+  pss10: "text-orange-500",
+  sleep_hygiene: "text-indigo-500"
 };
 
 interface SelfAssessmentProps {
-  assessmentType: keyof typeof assessments;
+  assessmentType: AssessmentType;
   onComplete?: (result: AssessmentResult) => void;
   onClose?: () => void;
 }
@@ -237,12 +66,40 @@ export default function SelfAssessment({ assessmentType, onComplete, onClose }: 
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [isCompleted, setIsCompleted] = useState(false);
   const [result, setResult] = useState<AssessmentResult | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const assessment = assessments[assessmentType];
+  const assessment = assessmentDefinitions[assessmentType];
+  const Icon = assessmentIcons[assessmentType];
+  const color = assessmentColors[assessmentType];
   const progress = ((currentQuestion + 1) / assessment.questions.length) * 100;
 
-  const handleAnswer = (questionId: string, value: number) => {
-    setAnswers(prev => ({ ...prev, [questionId]: value }));
+  // Load existing progress on mount
+  useEffect(() => {
+    const loadProgress = async () => {
+      try {
+        const progress = await getAssessmentProgress(assessmentType);
+        if (progress) {
+          setCurrentQuestion(progress.current_question);
+          setAnswers(progress.answers);
+        }
+      } catch (error) {
+        console.error('Error loading assessment progress:', error);
+      }
+    };
+
+    loadProgress();
+  }, [assessmentType]);
+
+  const handleAnswer = async (questionId: string, value: number) => {
+    const newAnswers = { ...answers, [questionId]: value };
+    setAnswers(newAnswers);
+    
+    // Save progress
+    try {
+      await saveAssessmentProgress(assessmentType, currentQuestion, newAnswers);
+    } catch (error) {
+      console.error('Error saving progress:', error);
+    }
   };
 
   const handleNext = () => {
@@ -259,120 +116,63 @@ export default function SelfAssessment({ assessmentType, onComplete, onClose }: 
     }
   };
 
-  const calculateResult = () => {
-    const totalScore = Object.values(answers).reduce((sum, score) => sum + score, 0);
-    
-    let level: AssessmentResult['level'];
-    let interpretation: string;
-    let recommendations: string[];
-    let resources: string[];
+  const calculateResult = async () => {
+    setIsLoading(true);
+    try {
+      const totalScore = Object.values(answers).reduce((sum, score) => sum + score, 0);
+      
+      // Check for crisis indicators (suicidal ideation in PHQ-9)
+      if (assessmentType === 'phq9' && answers.suicidal >= 1) {
+        // Show crisis warning before completing assessment
+        const confirmed = window.confirm(
+          'Your responses indicate you may be having thoughts of self-harm. ' +
+          'If you are in immediate danger, please call 988 (Suicide Prevention Lifeline) or 911. ' +
+          'Do you want to continue with the assessment?'
+        );
+        
+        if (!confirmed) {
+          setIsLoading(false);
+          return;
+        }
+      }
+      
+      // Complete assessment in database
+      const dbResult = await completeAssessment(assessmentType, totalScore, answers);
+      
+      const assessmentResult: AssessmentResult = {
+        score: totalScore,
+        level: dbResult.severity,
+        interpretation: dbResult.interpretation || '',
+        recommendations: dbResult.recommendations || [],
+        resources: dbResult.resources || []
+      };
 
-    if (assessmentType === 'phq9') {
-      if (totalScore <= 4) {
-        level = 'minimal';
-        interpretation = "Your responses suggest minimal depression symptoms.";
-        recommendations = [
-          "Continue your current self-care practices",
-          "Consider regular mood tracking",
-          "Maintain healthy lifestyle habits"
-        ];
-        resources = ["Mood tracking", "Meditation", "Exercise"];
-      } else if (totalScore <= 9) {
-        level = 'mild';
-        interpretation = "Your responses suggest mild depression symptoms.";
-        recommendations = [
-          "Consider talking to a healthcare provider",
-          "Try mood tracking and meditation",
-          "Focus on sleep and exercise"
-        ];
-        resources = ["Mood tracking", "Meditation", "Sleep resources", "Professional support"];
-      } else if (totalScore <= 14) {
-        level = 'moderate';
-        interpretation = "Your responses suggest moderate depression symptoms.";
-        recommendations = [
-          "Consider professional mental health support",
-          "Try structured self-care routines",
-          "Consider therapy or counseling"
-        ];
-        resources = ["Professional support", "Therapy resources", "Crisis support"];
-      } else if (totalScore <= 19) {
-        level = 'moderately_severe';
-        interpretation = "Your responses suggest moderately severe depression symptoms.";
-        recommendations = [
-          "Seek professional mental health support",
-          "Consider medication evaluation",
-          "Build a strong support network"
-        ];
-        resources = ["Professional support", "Crisis support", "Emergency resources"];
-      } else {
-        level = 'severe';
-        interpretation = "Your responses suggest severe depression symptoms.";
-        recommendations = [
-          "Seek immediate professional help",
-          "Consider crisis support services",
-          "Build emergency support plan"
-        ];
-        resources = ["Crisis support", "Emergency resources", "Professional support"];
-      }
-    } else { // GAD7
-      if (totalScore <= 4) {
-        level = 'minimal';
-        interpretation = "Your responses suggest minimal anxiety symptoms.";
-        recommendations = [
-          "Continue stress management practices",
-          "Consider regular anxiety tracking",
-          "Maintain relaxation routines"
-        ];
-        resources = ["Breathing exercises", "Meditation", "Stress management"];
-      } else if (totalScore <= 9) {
-        level = 'mild';
-        interpretation = "Your responses suggest mild anxiety symptoms.";
-        recommendations = [
-          "Try anxiety management techniques",
-          "Consider professional guidance",
-          "Practice regular relaxation"
-        ];
-        resources = ["Breathing exercises", "Meditation", "Anxiety management"];
-      } else if (totalScore <= 14) {
-        level = 'moderate';
-        interpretation = "Your responses suggest moderate anxiety symptoms.";
-        recommendations = [
-          "Consider professional mental health support",
-          "Try structured anxiety management",
-          "Consider therapy or counseling"
-        ];
-        resources = ["Professional support", "Therapy resources", "Anxiety management"];
-      } else {
-        level = 'severe';
-        interpretation = "Your responses suggest severe anxiety symptoms.";
-        recommendations = [
-          "Seek professional mental health support",
-          "Consider medication evaluation",
-          "Build anxiety management toolkit"
-        ];
-        resources = ["Professional support", "Crisis support", "Anxiety management"];
-      }
+      setResult(assessmentResult);
+      setIsCompleted(true);
+
+      onComplete?.(assessmentResult);
+    } catch (error) {
+      console.error('Error completing assessment:', error);
+      // Fallback to local calculation
+      const totalScore = Object.values(answers).reduce((sum, score) => sum + score, 0);
+      const level = calculateSeverity(assessmentType, totalScore);
+      const { interpretation, recommendations, resources } = generateInterpretation(assessmentType, totalScore, level);
+      
+      const assessmentResult: AssessmentResult = {
+        score: totalScore,
+        level,
+        interpretation,
+        recommendations,
+        resources
+      };
+
+      setResult(assessmentResult);
+      setIsCompleted(true);
+
+      onComplete?.(assessmentResult);
+    } finally {
+      setIsLoading(false);
     }
-
-    const assessmentResult: AssessmentResult = {
-      score: totalScore,
-      level,
-      interpretation,
-      recommendations,
-      resources
-    };
-
-    setResult(assessmentResult);
-    setIsCompleted(true);
-
-    // Log activity
-    logActivity('assessment', undefined, undefined, {
-      assessment_type: assessmentType,
-      score: totalScore,
-      level: level
-    });
-
-    onComplete?.(assessmentResult);
   };
 
   const resetAssessment = () => {
@@ -382,7 +182,7 @@ export default function SelfAssessment({ assessmentType, onComplete, onClose }: 
     setResult(null);
   };
 
-  const getLevelColor = (level: AssessmentResult['level']) => {
+  const getLevelColor = (level: AssessmentSeverity) => {
     switch (level) {
       case 'minimal': return 'text-green-500';
       case 'mild': return 'text-yellow-500';
@@ -393,7 +193,7 @@ export default function SelfAssessment({ assessmentType, onComplete, onClose }: 
     }
   };
 
-  const getLevelBadgeColor = (level: AssessmentResult['level']) => {
+  const getLevelBadgeColor = (level: AssessmentSeverity) => {
     switch (level) {
       case 'minimal': return 'bg-green-100 text-green-800';
       case 'mild': return 'bg-yellow-100 text-yellow-800';
@@ -409,7 +209,7 @@ export default function SelfAssessment({ assessmentType, onComplete, onClose }: 
       <Card className="w-full max-w-2xl mx-auto">
         <CardHeader className="text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <assessment.icon className={`h-8 w-8 ${assessment.color}`} />
+            <Icon className={`h-8 w-8 ${color}`} />
             <h2 className="text-2xl font-bold">Assessment Complete</h2>
           </div>
           <div className="space-y-2">
@@ -422,12 +222,37 @@ export default function SelfAssessment({ assessmentType, onComplete, onClose }: 
           <div className="text-center">
             <div className="text-4xl font-bold text-primary mb-2">{result.score}</div>
             <div className="text-sm text-muted-foreground mb-4">
-              out of {assessment.maxScore} total points
+              out of {assessment.max_score} total points
             </div>
             <Badge className={`${getLevelBadgeColor(result.level)} text-sm px-3 py-1`}>
               {result.level.replace('_', ' ').toUpperCase()}
             </Badge>
           </div>
+
+          {/* Crisis Warning for severe results */}
+          {result.level === 'severe' && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-semibold text-red-900 mb-2">Important Notice</h4>
+                  <p className="text-sm text-red-800 mb-3">
+                    Your responses suggest severe symptoms. Please consider reaching out for immediate professional help.
+                  </p>
+                  <div className="space-y-1 text-sm">
+                    <div>
+                      <strong className="text-red-900">Crisis Support:</strong>
+                      <a href="tel:988" className="text-red-800 ml-2 font-semibold hover:underline">988</a>
+                    </div>
+                    <div>
+                      <strong className="text-red-900">Emergency Services:</strong>
+                      <a href="tel:911" className="text-red-800 ml-2 font-semibold hover:underline">911</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Interpretation */}
           <div className="bg-muted/50 rounded-lg p-4">
@@ -479,45 +304,60 @@ export default function SelfAssessment({ assessmentType, onComplete, onClose }: 
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <div className="flex items-center gap-2 mb-4">
-          <assessment.icon className={`h-6 w-6 ${assessment.color}`} />
-          <h2 className="text-xl font-bold">{assessment.name}</h2>
+      <CardHeader className="pb-4">
+        <div className="flex items-center gap-2 mb-3">
+          <Icon className={`h-5 w-5 sm:h-6 sm:w-6 ${color}`} />
+          <h2 className="text-lg sm:text-xl font-bold">{assessment.name}</h2>
         </div>
-        <p className="text-muted-foreground">{assessment.description}</p>
+        <p className="text-sm sm:text-base text-muted-foreground mb-4">{assessment.description}</p>
         <div className="space-y-2">
-          <div className="flex justify-between text-sm text-muted-foreground">
+          <div className="flex justify-between text-xs sm:text-sm text-muted-foreground">
             <span>Question {currentQuestion + 1} of {assessment.questions.length}</span>
             <span>{Math.round(progress)}% complete</span>
           </div>
           <Progress value={progress} className="h-2" />
         </div>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 sm:space-y-6">
         {/* Question */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">
+        <div className="space-y-3 sm:space-y-4">
+          <h3 
+            id={`question-${currentQ.id}`}
+            className="text-base sm:text-lg font-semibold leading-tight"
+          >
             {currentQ.text}
           </h3>
           
           <RadioGroup
             value={answers[currentQ.id]?.toString()}
             onValueChange={(value) => handleAnswer(currentQ.id, parseInt(value))}
-            className="space-y-3"
+            className="space-y-2 sm:space-y-3"
+            role="radiogroup"
+            aria-labelledby={`question-${currentQ.id}`}
           >
             {currentQ.options.map((option) => (
-              <div key={option.value} className="flex items-center space-x-2">
-                <RadioGroupItem value={option.value.toString()} id={`${currentQ.id}-${option.value}`} />
+              <div key={option.value} className="flex items-start space-x-2 sm:space-x-3">
+                <RadioGroupItem 
+                  value={option.value.toString()} 
+                  id={`${currentQ.id}-${option.value}`}
+                  className="mt-1 flex-shrink-0"
+                  aria-describedby={option.description ? `${currentQ.id}-${option.value}-desc` : undefined}
+                />
                 <Label 
                   htmlFor={`${currentQ.id}-${option.value}`}
-                  className="flex-1 cursor-pointer p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+                  className="flex-1 cursor-pointer p-2 sm:p-3 rounded-lg border border-border hover:bg-muted/50 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 transition-colors min-h-[60px] flex items-center"
                 >
-                  <div className="font-medium">{option.label}</div>
-                  {option.description && (
-                    <div className="text-sm text-muted-foreground mt-1">
-                      {option.description}
-                    </div>
-                  )}
+                  <div>
+                    <div className="font-medium text-sm sm:text-base">{option.label}</div>
+                    {option.description && (
+                      <div 
+                        id={`${currentQ.id}-${option.value}-desc`}
+                        className="text-xs sm:text-sm text-muted-foreground mt-1"
+                      >
+                        {option.description}
+                      </div>
+                    )}
+                  </div>
                 </Label>
               </div>
             ))}
@@ -525,22 +365,24 @@ export default function SelfAssessment({ assessmentType, onComplete, onClose }: 
         </div>
 
         {/* Navigation */}
-        <div className="flex justify-between pt-4">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-0 sm:justify-between pt-4">
           <Button
             variant="outline"
             onClick={handlePrevious}
             disabled={currentQuestion === 0}
-            className="gap-2"
+            className="gap-2 order-2 sm:order-1"
+            size="sm"
           >
             <ArrowLeft className="h-4 w-4" />
             Previous
           </Button>
           <Button
             onClick={handleNext}
-            disabled={!isAnswered}
-            className="gap-2"
+            disabled={!isAnswered || isLoading}
+            className="gap-2 order-1 sm:order-2"
+            size="sm"
           >
-            {currentQuestion === assessment.questions.length - 1 ? 'Complete' : 'Next'}
+            {isLoading ? 'Processing...' : currentQuestion === assessment.questions.length - 1 ? 'Complete' : 'Next'}
             <ArrowRight className="h-4 w-4" />
           </Button>
         </div>

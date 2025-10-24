@@ -17,6 +17,9 @@ export type ExperienceLevel = "beginner" | "intermediate" | "advanced";
 export type SessionLength = "short" | "medium" | "long";
 export type NotificationFrequency = "none" | "daily" | "weekly" | "custom";
 
+export type AssessmentType = "phq9" | "gad7" | "pss10" | "sleep_hygiene";
+export type AssessmentSeverity = "minimal" | "mild" | "moderate" | "moderately_severe" | "severe";
+
 /* -------------------------------------------------------------
    Core User and Journal Types
 -------------------------------------------------------------- */
@@ -336,6 +339,46 @@ export interface UserActivityLog {
   created_at: string;
 }
 
+/* -------------------------------------------------------------
+   Assessment System
+-------------------------------------------------------------- */
+
+export interface Assessment {
+  id: string;
+  name: string;
+  description: string | null;
+  category: string;
+  duration_minutes: number | null;
+  max_score: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AssessmentResult {
+  id: string;
+  user_id: string;
+  assessment_type: AssessmentType;
+  score: number;
+  severity: AssessmentSeverity;
+  interpretation: string | null;
+  recommendations: string[] | null;
+  resources: string[] | null;
+  responses: Record<string, any>;
+  completed_at: string;
+  created_at: string;
+}
+
+export interface AssessmentProgress {
+  id: string;
+  user_id: string;
+  assessment_type: AssessmentType;
+  current_question: number;
+  answers: Record<string, any>;
+  started_at: string;
+  updated_at: string;
+}
+
 export interface ContentRecommendation {
   id: string;
   user_id: string;
@@ -374,3 +417,15 @@ export type UpdateUserActivityLog = Partial<
 export type UpdateContentRecommendation = Partial<
   Omit<ContentRecommendation, "id" | "user_id" | "created_at">
 >;
+
+/* -------------------------------------------------------------
+   Insert and Update Types for Assessment System
+-------------------------------------------------------------- */
+
+export type InsertAssessment = Omit<Assessment, "id" | "created_at" | "updated_at">;
+export type InsertAssessmentResult = Omit<AssessmentResult, "id" | "completed_at" | "created_at">;
+export type InsertAssessmentProgress = Omit<AssessmentProgress, "id" | "started_at" | "updated_at">;
+
+export type UpdateAssessment = Partial<Omit<Assessment, "id" | "created_at" | "updated_at">>;
+export type UpdateAssessmentResult = Partial<Omit<AssessmentResult, "id" | "user_id" | "created_at">>;
+export type UpdateAssessmentProgress = Partial<Omit<AssessmentProgress, "id" | "user_id" | "started_at" | "updated_at">>;
