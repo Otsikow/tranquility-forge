@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppBar } from "@/components/AppBar";
 import { BottomNav } from "@/components/BottomNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { 
   Brain, 
   Heart, 
@@ -16,6 +16,9 @@ import {
   BarChart3,
   BookOpen
 } from "lucide-react";
+import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import { supabase } from "@/integrations/supabase/client";
+import { getOfflineAssessmentsByType } from "@/lib/offlineStorage";
 import SelfAssessment from "@/components/SelfAssessment";
 import type { AssessmentResult } from "@/components/SelfAssessment";
 
@@ -81,6 +84,8 @@ export default function Assessments() {
   const [selectedAssessment, setSelectedAssessment] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [assessmentResults, setAssessmentResults] = useState<Record<string, AssessmentResult>>({});
+  const [historyDialog, setHistoryDialog] = useState<{ id: string; name: string } | null>(null);
+  const [historyData, setHistoryData] = useState<{ day: string; value: number }[]>([]);
 
   const filteredAssessments = selectedCategory === 'all' 
     ? availableAssessments 
@@ -112,6 +117,50 @@ export default function Assessments() {
       color: getStatusColor(result.level)
     };
   };
+
+  // Load history when dialog opens
+  useEffect(() => {
+    const loadHistory = async () => {
+      if (!historyDialog) return;
+      const type = historyDialog.id as 'phq9' | 'gad7' | 'pss10' | 'sleep_hygiene';
+
+      const offline = await getOfflineAssessmentsByType(type);
+      const offlinePoints = offline
+        .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+        .map((r) => ({
+          day: new Date(r.created_at).toLocaleDateString(),
+          value: r.score,
+        }));
+
+      try {
+        const { data } = await supabase
+          .from('user_activity_log')
+          .select('created_at, metadata')
+          .eq('activity_type', 'assessment')
+          .contains('metadata', { assessment_type: type })
+          .order('created_at', { ascending: true });
+        const serverPoints = (data || [])
+          .map((row: any) => ({
+            day: new Date(row.created_at).toLocaleDateString(),
+            value: Number((row.metadata as any)?.score || 0),
+          }));
+
+        // Merge and dedupe by day+value
+        const combined = [...offlinePoints, ...serverPoints];
+        const seen = new Set<string>();
+        const deduped = combined.filter((p) => {
+          const key = `${p.day}|${p.value}`;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+        setHistoryData(deduped);
+      } catch {
+        setHistoryData(offlinePoints);
+      }
+    };
+    loadHistory();
+  }, [historyDialog]);
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -215,17 +264,14 @@ export default function Assessments() {
                       >
                         Retake Assessment
                       </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="w-full"
-                        onClick={() => {
-                          // Show detailed results
-                          console.log('Show results for', assessment.id);
-                        }}
-                      >
-                        View Detailed Results
-                      </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="w-full"
+                      onClick={() => setHistoryDialog({ id: assessment.id, name: assessment.name })}
+                    >
+                      View Detailed Results
+                    </Button>
                     </div>
                   ) : (
                     <Button 
@@ -281,11 +327,31 @@ export default function Assessments() {
           </DialogHeader>
           {selectedAssessment && (
             <SelfAssessment
-              assessmentType={selectedAssessment as 'phq9' | 'gad7'}
+              assessmentType={selectedAssessment as 'phq9' | 'gad7' | 'pss10' | 'sleep_hygiene'}
               onComplete={(result) => handleAssessmentComplete(selectedAssessment, result)}
               onClose={() => setSelectedAssessment(null)}
             />
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* History Dialog */}
+      <Dialog open={!!historyDialog} onOpenChange={() => setHistoryDialog(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{historyDialog?.name} — History</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={historyData}>
+                  <XAxis dataKey="day" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis hide />
+                  <Line type="monotone" dataKey="value" stroke="hsl(var(--primary))" strokeWidth={3} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 

@@ -1,7 +1,7 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
 
 const DB_NAME = 'PeaceOfflineDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 // Storage quotas (in bytes)
 export const STORAGE_QUOTAS = {
@@ -14,6 +14,10 @@ export const STORAGE_QUOTAS = {
 export const LIMITS = {
   MAX_JOURNALS: 200,
   MOOD_DAYS: 60,
+};
+
+export const ASSESSMENT_LIMITS = {
+  MAX_ASSESSMENTS: 300,
 };
 
 // Database schema
@@ -72,6 +76,25 @@ interface PeaceDB extends DBSchema {
       last_cleanup: string;
     };
   };
+  assessments: {
+    key: string;
+    value: {
+      id: string;
+      user_id: string;
+      assessment_type: string;
+      score: number;
+      level: string;
+      responses?: Record<string, number>;
+      created_at: string;
+      synced: boolean;
+      size: number;
+    };
+    indexes: {
+      'by-date': string;
+      'by-type': string;
+      'by-synced': number;
+    };
+  };
 }
 
 let dbInstance: IDBPDatabase<PeaceDB> | null = null;
@@ -105,6 +128,14 @@ export const openOfflineDB = async (): Promise<IDBPDatabase<PeaceDB>> => {
       // Metadata store
       if (!db.objectStoreNames.contains('metadata')) {
         db.createObjectStore('metadata', { keyPath: 'key' });
+      }
+
+      // Assessments store
+      if (!db.objectStoreNames.contains('assessments')) {
+        const assessmentStore = db.createObjectStore('assessments', { keyPath: 'id' });
+        assessmentStore.createIndex('by-date', 'created_at');
+        assessmentStore.createIndex('by-type', 'assessment_type');
+        assessmentStore.createIndex('by-synced', 'synced');
       }
     },
   });
@@ -325,9 +356,13 @@ export const getTotalStorageSize = async (): Promise<number> => {
   const journalSize = journals.reduce((sum, j) => sum + (j.size || 0), 0);
 
   const meditations = await db.getAll('meditations');
+  const assessments = db.objectStoreNames.contains('assessments')
+    ? await db.getAll('assessments')
+    : [];
   const meditationSize = meditations.reduce((sum, m) => sum + m.size, 0);
+  const assessmentSize = assessments.reduce((sum: number, a: any) => sum + (a.size || 0), 0);
 
-  return journalSize + meditationSize;
+  return journalSize + meditationSize + assessmentSize;
 };
 
 export const getStorageStats = async () => {
@@ -339,9 +374,13 @@ export const getStorageStats = async () => {
   const moods = await db.getAll('moods');
 
   const meditations = await db.getAll('meditations');
+  const assessments = db.objectStoreNames.contains('assessments')
+    ? await db.getAll('assessments')
+    : [];
   const meditationSize = meditations.reduce((sum, m) => sum + m.size, 0);
+  const assessmentSize = assessments.reduce((sum: number, a: any) => sum + (a.size || 0), 0);
 
-  const totalSize = journalSize + meditationSize;
+  const totalSize = journalSize + meditationSize + assessmentSize;
 
   return {
     journals: {
@@ -354,6 +393,10 @@ export const getStorageStats = async () => {
     meditations: {
       count: meditations.length,
       size: meditationSize,
+    },
+    assessments: {
+      count: assessments.length,
+      size: assessmentSize,
     },
     total: {
       size: totalSize,
@@ -369,6 +412,9 @@ export const clearAllOfflineData = async (): Promise<void> => {
   await db.clear('journals');
   await db.clear('moods');
   await db.clear('meditations');
+  if (db.objectStoreNames.contains('assessments')) {
+    await db.clear('assessments');
+  }
   await db.clear('metadata');
 
   console.log('[Offline] All offline data cleared');
@@ -385,4 +431,72 @@ export const checkStorageQuota = async () => {
     };
   }
   return null;
+};
+
+// === ASSESSMENTS ===
+
+export interface OfflineAssessmentRecord {
+  id: string;
+  user_id: string;
+  assessment_type: string;
+  score: number;
+  level: string;
+  responses?: Record<string, number>;
+  created_at: string;
+  synced: boolean;
+  size: number;
+}
+
+export const saveAssessmentOffline = async (
+  record: Omit<OfflineAssessmentRecord, 'size' | 'synced'>
+): Promise<void> => {
+  const db = await openOfflineDB();
+  const size = new Blob([JSON.stringify(record)]).size;
+
+  await db.put('assessments', {
+    ...record,
+    synced: false,
+    size,
+  });
+
+  await enforceAssessmentLimit();
+};
+
+export const getOfflineAssessments = async (
+  limit = ASSESSMENT_LIMITS.MAX_ASSESSMENTS
+): Promise<OfflineAssessmentRecord[]> => {
+  const db = await openOfflineDB();
+  const all = await db.getAllFromIndex('assessments', 'by-date');
+  return all.slice(-limit).reverse() as OfflineAssessmentRecord[];
+};
+
+export const getOfflineAssessmentsByType = async (
+  assessmentType: string,
+  limit = ASSESSMENT_LIMITS.MAX_ASSESSMENTS
+): Promise<OfflineAssessmentRecord[]> => {
+  const db = await openOfflineDB();
+  const index = db.transaction('assessments').store.index('by-type');
+  const results = await index.getAll(assessmentType);
+  return (results as OfflineAssessmentRecord[]).slice(-limit).reverse();
+};
+
+export const markAssessmentSynced = async (id: string): Promise<void> => {
+  const db = await openOfflineDB();
+  const rec = await db.get('assessments', id);
+  if (rec) {
+    rec.synced = true;
+    await db.put('assessments', rec);
+  }
+};
+
+const enforceAssessmentLimit = async (): Promise<void> => {
+  const db = await openOfflineDB();
+  const all = await db.getAllFromIndex('assessments', 'by-date');
+  if (all.length > ASSESSMENT_LIMITS.MAX_ASSESSMENTS) {
+    const toDelete = all.slice(0, all.length - ASSESSMENT_LIMITS.MAX_ASSESSMENTS);
+    for (const rec of toDelete) {
+      await db.delete('assessments', (rec as any).id);
+    }
+    console.log(`[Offline] Evicted ${toDelete.length} old assessments`);
+  }
 };
