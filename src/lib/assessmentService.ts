@@ -12,6 +12,9 @@ import type {
   AssessmentSeverity 
 } from '@/types/db';
 
+// Re-export types for use in other files
+export type { AssessmentType, AssessmentSeverity };
+
 export interface AssessmentQuestion {
   id: string;
   text: string;

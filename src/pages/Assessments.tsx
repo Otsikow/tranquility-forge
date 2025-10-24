@@ -464,5 +464,56 @@ export default function Assessments() {
                 </p>
                 <div className="space-y-2">
                   <div className="text-sm">
-                    <strong className="text-red-900">National Suicide Prevention Lifeline:</strong>
-                    <a href="tel:988
+                    <strong className="text-red-900">National Suicide Prevention Lifeline:</strong>{" "}
+                    <a href="tel:988" className="text-red-900 underline font-semibold">
+                      988
+                    </a>
+                  </div>
+                  <div className="text-sm">
+                    <strong className="text-red-900">Crisis Text Line:</strong>{" "}
+                    <span className="text-red-900">Text HOME to 741741</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <BottomNav />
+
+      {/* Assessment Dialog */}
+      <Dialog open={!!selectedAssessment} onOpenChange={() => setSelectedAssessment(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Assessment</DialogTitle>
+          </DialogHeader>
+          {selectedAssessment && (
+            <SelfAssessment
+              assessmentType={selectedAssessment}
+              onComplete={(result) => handleAssessmentComplete(selectedAssessment, result)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Detailed Results Dialog */}
+      <Dialog
+        open={!!detailedResultsAssessment}
+        onOpenChange={() => setDetailedResultsAssessment(null)}
+      >
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Detailed Assessment Results</DialogTitle>
+          </DialogHeader>
+          {detailedResultsAssessment && assessmentResults[detailedResultsAssessment] && (
+            <AssessmentDetailedResults
+              assessmentType={detailedResultsAssessment}
+              result={assessmentResults[detailedResultsAssessment]}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
