@@ -20,7 +20,7 @@ import ResetPassword from "./pages/auth/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 
 // Lazy load heavy routes for code splitting
-const Chat = lazy(() => import("./pages/Chat"));
+const Chat = lazy(() => import("./pages/EnhancedChat"));
 const Moods = lazy(() => import("./pages/Moods"));
 const Journal = lazy(() => import("./pages/Journal"));
 const JournalNew = lazy(() => import("./pages/JournalNew"));
@@ -29,8 +29,15 @@ const Meditations = lazy(() => import("./pages/Meditations"));
 const MeditationPlayer = lazy(() => import("./pages/MeditationPlayer"));
 const Affirmations = lazy(() => import("./pages/Affirmations"));
 const Breathe = lazy(() => import("./pages/Breathe"));
+const Community = lazy(() => import("./pages/Community"));
+const ForumPost = lazy(() => import("./pages/ForumPost"));
+const NewForumPost = lazy(() => import("./pages/NewForumPost"));
+const CBTTools = lazy(() => import("./pages/CBTTools"));
+const Sleep = lazy(() => import("./pages/Sleep"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Settings = lazy(() => import("./pages/Settings"));
+const Subscription = lazy(() => import("./pages/Subscription"));
+const NotificationSettings = lazy(() => import("./pages/NotificationSettings"));
 const ProfileSecurity = lazy(() => import("./pages/settings/ProfileSecurity"));
 const Notifications = lazy(() => import("./pages/settings/Notifications"));
 const Help = lazy(() => import("./pages/settings/Help"));
@@ -77,10 +84,16 @@ const App = () => {
             <Route path="/meditations/:id" element={<MeditationPlayer />} />
             <Route path="/affirmations" element={<Affirmations />} />
             <Route path="/breathe" element={<Breathe />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/community/post/:id" element={<ForumPost />} />
+            <Route path="/community/new-post" element={<NewForumPost />} />
+            <Route path="/cbt" element={<CBTTools />} />
+            <Route path="/sleep" element={<Sleep />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/subscription" element={<Subscription />} />
             <Route path="/settings/profile-security" element={<ProfileSecurity />} />
-            <Route path="/settings/notifications" element={<Notifications />} />
+            <Route path="/settings/notifications" element={<NotificationSettings />} />
             <Route path="/settings/help" element={<Help />} />
             <Route path="/settings/about" element={<About />} />
             <Route path="/settings/legal" element={<Legal />} />

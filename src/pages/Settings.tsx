@@ -1,7 +1,7 @@
 import { AppBar } from "@/components/AppBar";
 import { BottomNav } from "@/components/BottomNav";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronRight, User, Bell, HelpCircle, Info, FileText, Shield } from "lucide-react";
+import { ChevronRight, User, Bell, HelpCircle, Info, FileText, Shield, CreditCard, Crown } from "lucide-react";
 import { Link } from "react-router-dom";
 import banffImage from "@/assets/banff-lake.jpg";
 
@@ -11,6 +11,13 @@ const settingsSections = [
     description: "Manage your account and privacy settings",
     icon: User,
     path: "/settings/profile-security",
+    color: "text-primary",
+  },
+  {
+    title: "Subscription",
+    description: "Manage your subscription and billing",
+    icon: CreditCard,
+    path: "/subscription",
     color: "text-primary",
   },
   {
