@@ -5,14 +5,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BottomNav } from "@/components/BottomNav";
 import { MoodChart } from "@/components/MoodChart";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
+import OnboardingFlow from "@/components/OnboardingFlow";
 import { Leaf, BookOpen, Wind, MessageCircle, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import logoImage from "@/assets/logo.png";
 import hummingbirdImage from "@/assets/hummingbird.png";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [userName, setUserName] = useState("Alex");
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [moodData] = useState([
     { day: "Mon", value: 6 },
     { day: "Tue", value: 8 },
@@ -22,6 +26,7 @@ export default function Dashboard() {
     { day: "Sat", value: 9 },
     { day: "Sun", value: 8 },
   ]);
+  const { profile, loading: profileLoading } = useUserProfile();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -34,6 +39,22 @@ export default function Dashboard() {
     };
     checkAuth();
   }, [navigate]);
+
+  useEffect(() => {
+    if (profile && !profile.onboarding_completed) {
+      setShowOnboarding(true);
+    }
+  }, [profile]);
+
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+    // Refresh profile data
+    window.location.reload();
+  };
+
+  if (showOnboarding) {
+    return <OnboardingFlow onComplete={handleOnboardingComplete} />;
+  }
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -78,90 +99,100 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="px-6 py-6 space-y-6 animate-fade-up max-w-4xl mx-auto">
-        {/* Mood Chart */}
-        <Card className="bg-muted border-border">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-card-foreground">Your Weekly Mood</CardTitle>
-              <div className="text-sm text-primary font-semibold">Up</div>
-            </div>
-            <p className="text-sm text-muted-foreground">Last 7 days +5%</p>
-          </CardHeader>
-          <CardContent>
-            <MoodChart data={moodData} />
-          </CardContent>
-        </Card>
+      <div className="px-6 py-6 animate-fade-up max-w-4xl mx-auto">
+        {profileLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        ) : profile?.onboarding_completed ? (
+          <PersonalizedDashboard userName={userName} />
+        ) : (
+          <div className="space-y-6">
+            {/* Mood Chart */}
+            <Card className="bg-muted border-border">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-card-foreground">Your Weekly Mood</CardTitle>
+                  <div className="text-sm text-primary font-semibold">Up</div>
+                </div>
+                <p className="text-sm text-muted-foreground">Last 7 days +5%</p>
+              </CardHeader>
+              <CardContent>
+                <MoodChart data={moodData} />
+              </CardContent>
+            </Card>
 
-        {/* Today's Affirmation */}
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle className="text-card-foreground">Today's Affirmation</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-card-foreground text-lg font-medium">
-              I am capable of amazing things.
-            </p>
-          </CardContent>
-        </Card>
+            {/* Today's Affirmation */}
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <CardTitle className="text-card-foreground">Today's Affirmation</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-card-foreground text-lg font-medium">
+                  I am capable of amazing things.
+                </p>
+              </CardContent>
+            </Card>
 
-        {/* Recent Journal */}
-        <Card className="bg-muted border-border">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-card-foreground">Recent Thoughts</CardTitle>
+            {/* Recent Journal */}
+            <Card className="bg-muted border-border">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-card-foreground">Recent Thoughts</CardTitle>
+                  <Button
+                    variant="link"
+                    className="text-primary p-0 h-auto"
+                    onClick={() => navigate("/journal")}
+                  >
+                    View All
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-start gap-3">
+                  <div className="w-12 h-12 rounded-lg bg-card flex items-center justify-center">
+                    <BookOpen className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-card-foreground text-sm">
+                      Today I felt a sense of calm during my morning walk. The sun was...
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quick Actions */}
+            <div className="space-y-3">
               <Button
-                variant="link"
-                className="text-primary p-0 h-auto"
-                onClick={() => navigate("/journal")}
+                size="lg"
+                className="w-full justify-start"
+                onClick={() => navigate("/journal/new")}
               >
-                View All
+                <BookOpen className="h-5 w-5 mr-2" />
+                New Journal Entry
+              </Button>
+              <Button
+                size="lg"
+                variant="dark"
+                className="w-full justify-start"
+                onClick={() => navigate("/breathe")}
+              >
+                <Wind className="h-5 w-5 mr-2" />
+                Start Meditation
+              </Button>
+              <Button
+                size="lg"
+                variant="dark"
+                className="w-full justify-start"
+                onClick={() => navigate("/chat")}
+              >
+                <MessageCircle className="h-5 w-5 mr-2" />
+                Talk to Peace
               </Button>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-start gap-3">
-              <div className="w-12 h-12 rounded-lg bg-card flex items-center justify-center">
-                <BookOpen className="h-6 w-6 text-primary" />
-              </div>
-              <div className="flex-1">
-                <p className="text-card-foreground text-sm">
-                  Today I felt a sense of calm during my morning walk. The sun was...
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions */}
-        <div className="space-y-3">
-          <Button
-            size="lg"
-            className="w-full justify-start"
-            onClick={() => navigate("/journal/new")}
-          >
-            <BookOpen className="h-5 w-5 mr-2" />
-            New Journal Entry
-          </Button>
-          <Button
-            size="lg"
-            variant="dark"
-            className="w-full justify-start"
-            onClick={() => navigate("/breathe")}
-          >
-            <Wind className="h-5 w-5 mr-2" />
-            Start Meditation
-          </Button>
-          <Button
-            size="lg"
-            variant="dark"
-            className="w-full justify-start"
-            onClick={() => navigate("/chat")}
-          >
-            <MessageCircle className="h-5 w-5 mr-2" />
-            Talk to Peace
-          </Button>
-        </div>
+          </div>
+        )}
       </div>
 
       <BottomNav />

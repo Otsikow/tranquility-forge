@@ -29,6 +29,7 @@ const Meditations = lazy(() => import("./pages/Meditations"));
 const MeditationPlayer = lazy(() => import("./pages/MeditationPlayer"));
 const Affirmations = lazy(() => import("./pages/Affirmations"));
 const Breathe = lazy(() => import("./pages/Breathe"));
+const Assessments = lazy(() => import("./pages/Assessments"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Settings = lazy(() => import("./pages/Settings"));
 const ProfileSecurity = lazy(() => import("./pages/settings/ProfileSecurity"));
@@ -77,6 +78,7 @@ const App = () => {
             <Route path="/meditations/:id" element={<MeditationPlayer />} />
             <Route path="/affirmations" element={<Affirmations />} />
             <Route path="/breathe" element={<Breathe />} />
+            <Route path="/assessments" element={<Assessments />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/settings/profile-security" element={<ProfileSecurity />} />
