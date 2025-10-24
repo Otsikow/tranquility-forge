@@ -9,6 +9,9 @@ export interface UsersProfile {
   avatar_url: string | null;
   timezone: string;
   created_at: string;
+  goals?: string[]; // e.g., ['stress', 'sleep', 'anxiety']
+  preferences?: Record<string, unknown>; // jsonb map for personalization
+  demographics?: Record<string, unknown>; // jsonb map (age_range, region, etc.)
 }
 
 export interface JournalEntry {
@@ -30,6 +33,9 @@ export interface Meditation {
   audio_url: string | null;
   is_free: boolean;
   created_at: string;
+  categories?: string[];
+  tags?: string[];
+  level?: 'beginner' | 'intermediate' | 'advanced';
 }
 
 export interface SessionPlayed {

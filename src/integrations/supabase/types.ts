@@ -91,6 +91,9 @@ export type Database = {
           duration_seconds: number
           id: string
           is_free: boolean | null
+          categories: string[] | null
+          tags: string[] | null
+          level: string | null
           title: string
         }
         Insert: {
@@ -101,6 +104,9 @@ export type Database = {
           duration_seconds: number
           id?: string
           is_free?: boolean | null
+          categories?: string[] | null
+          tags?: string[] | null
+          level?: string | null
           title: string
         }
         Update: {
@@ -111,6 +117,9 @@ export type Database = {
           duration_seconds?: number
           id?: string
           is_free?: boolean | null
+          categories?: string[] | null
+          tags?: string[] | null
+          level?: string | null
           title?: string
         }
         Relationships: []
@@ -241,6 +250,9 @@ export type Database = {
           display_name: string | null
           id: string
           timezone: string | null
+          goals: string[] | null
+          preferences: Json | null
+          demographics: Json | null
         }
         Insert: {
           avatar_url?: string | null
@@ -248,6 +260,9 @@ export type Database = {
           display_name?: string | null
           id: string
           timezone?: string | null
+          goals?: string[] | null
+          preferences?: Json | null
+          demographics?: Json | null
         }
         Update: {
           avatar_url?: string | null
@@ -255,6 +270,9 @@ export type Database = {
           display_name?: string | null
           id?: string
           timezone?: string | null
+          goals?: string[] | null
+          preferences?: Json | null
+          demographics?: Json | null
         }
         Relationships: []
       }

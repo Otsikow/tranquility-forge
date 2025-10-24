@@ -15,7 +15,7 @@ export function useMeditations() {
       try {
         const { data, error } = await supabase
           .from('meditations')
-          .select('*')
+          .select('id, title, description, duration_seconds, cover_url, audio_url, is_free, created_at, categories, tags, level')
           .order('created_at', { ascending: false });
 
         if (error) throw error;
