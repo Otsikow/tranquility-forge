@@ -7,7 +7,21 @@ import { MoodChart } from "@/components/MoodChart";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import PersonalizedDashboard from "@/components/PersonalizedDashboard";
 import OnboardingFlow from "@/components/OnboardingFlow";
-import { Leaf, BookOpen, Wind, MessageCircle, Settings } from "lucide-react";
+import { 
+  Leaf, 
+  BookOpen, 
+  Wind, 
+  MessageCircle, 
+  Settings, 
+  Heart, 
+  Users, 
+  Brain, 
+  Moon, 
+  ClipboardList,
+  Sparkles,
+  Activity,
+  ArrowRight
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import logoImage from "@/assets/logo.png";
@@ -162,34 +176,82 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            {/* Quick Actions */}
-            <div className="space-y-3">
-              <Button
-                size="lg"
-                className="w-full justify-start"
-                onClick={() => navigate("/journal/new")}
-              >
-                <BookOpen className="h-5 w-5 mr-2" />
-                New Journal Entry
-              </Button>
-              <Button
-                size="lg"
-                variant="dark"
-                className="w-full justify-start"
-                onClick={() => navigate("/breathe")}
-              >
-                <Wind className="h-5 w-5 mr-2" />
-                Start Meditation
-              </Button>
-              <Button
-                size="lg"
-                variant="dark"
-                className="w-full justify-start"
-                onClick={() => navigate("/chat")}
-              >
-                <MessageCircle className="h-5 w-5 mr-2" />
-                Talk to Peace
-              </Button>
+            {/* Quick Links */}
+            <div className="space-y-6">
+              <h3 className="text-xl font-semibold text-foreground">Quick Access</h3>
+              
+              {/* Primary Actions */}
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  size="lg"
+                  className="h-20 flex-col gap-2"
+                  onClick={() => navigate("/wellness")}
+                >
+                  <Heart className="h-6 w-6" />
+                  <span className="text-sm">Wellness</span>
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="h-20 flex-col gap-2"
+                  onClick={() => navigate("/journal")}
+                >
+                  <BookOpen className="h-6 w-6" />
+                  <span className="text-sm">Journal</span>
+                </Button>
+              </div>
+
+              {/* Secondary Actions */}
+              <div className="space-y-2">
+                <Button
+                  size="lg"
+                  variant="ghost"
+                  className="w-full justify-between"
+                  onClick={() => navigate("/journal/new")}
+                >
+                  <div className="flex items-center gap-3">
+                    <BookOpen className="h-5 w-5 text-primary" />
+                    <span>New Journal Entry</span>
+                  </div>
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="lg"
+                  variant="ghost"
+                  className="w-full justify-between"
+                  onClick={() => navigate("/breathe")}
+                >
+                  <div className="flex items-center gap-3">
+                    <Wind className="h-5 w-5 text-primary" />
+                    <span>Breathing Exercise</span>
+                  </div>
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="lg"
+                  variant="ghost"
+                  className="w-full justify-between"
+                  onClick={() => navigate("/chat")}
+                >
+                  <div className="flex items-center gap-3">
+                    <MessageCircle className="h-5 w-5 text-primary" />
+                    <span>Talk to Peace</span>
+                  </div>
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="lg"
+                  variant="ghost"
+                  className="w-full justify-between"
+                  onClick={() => navigate("/community")}
+                >
+                  <div className="flex items-center gap-3">
+                    <Users className="h-5 w-5 text-primary" />
+                    <span>Community</span>
+                  </div>
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         )}
