@@ -28,6 +28,7 @@ import {
   getAvailableAssessments,
   getAssessmentHistoryWithInsights,
   exportAssessmentResults,
+  assessmentDefinitions,
   type AssessmentType,
   type AssessmentResultWithInsights,
 } from "@/lib/assessmentService";
@@ -75,13 +76,26 @@ export default function Assessments() {
     const loadData = async () => {
       try {
         setIsLoading(true);
-        const [assessments, history] = await Promise.all([
+        const [assessmentsFromDb, phqHistory, gad7History, pss10History, sleepHistory] = await Promise.all([
           getAvailableAssessments(),
           getAssessmentHistoryWithInsights("phq9", 5),
+          getAssessmentHistoryWithInsights("gad7", 5),
+          getAssessmentHistoryWithInsights("pss10", 5),
+          getAssessmentHistoryWithInsights("sleep_hygiene", 5),
         ]);
 
-        setAvailableAssessments(assessments);
-        setAssessmentHistory(history);
+        const fallbackAssessments = Object.values(assessmentDefinitions) as any[];
+        setAvailableAssessments(
+          assessmentsFromDb && assessmentsFromDb.length > 0 ? assessmentsFromDb : fallbackAssessments
+        );
+
+        const combinedHistory = [
+          ...phqHistory,
+          ...gad7History,
+          ...pss10History,
+          ...sleepHistory,
+        ].sort((a, b) => new Date(b.completed_at).getTime() - new Date(a.completed_at).getTime());
+        setAssessmentHistory(combinedHistory);
       } catch (error) {
         console.error("Error loading assessment data:", error);
       } finally {
@@ -138,10 +152,8 @@ export default function Assessments() {
   };
 
   const handleExportResults = () => {
-    const results = Object.values(assessmentResults);
-    if (results.length === 0) return;
-
-    const csvContent = exportAssessmentResults(results as any);
+    if (assessmentHistory.length === 0) return;
+    const csvContent = exportAssessmentResults(assessmentHistory as any);
     const blob = new Blob([csvContent], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -264,32 +276,23 @@ export default function Assessments() {
                           )}
                         </div>
 
-                        {status ? (
-                          <div className="space-y-2">
-                            <Button
-                              variant="outline"
-                              className="w-full"
-                              onClick={() => setSelectedAssessment(assessment.id as AssessmentType)}
-                            >
-                              Retake Assessment
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="w-full"
-                              onClick={() => setDetailedResultsAssessment(assessment.id as AssessmentType)}
-                            >
-                              View Detailed Results
-                            </Button>
-                          </div>
-                        ) : (
+                        <div className="space-y-2">
                           <Button
+                            variant={status ? "outline" : "default"}
                             className="w-full"
                             onClick={() => setSelectedAssessment(assessment.id as AssessmentType)}
                           >
-                            Start Assessment
+                            {status ? "Retake Assessment" : "Start Assessment"}
                           </Button>
-                        )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="w-full"
+                            onClick={() => setDetailedResultsAssessment(assessment.id as AssessmentType)}
+                          >
+                            View Detailed Results
+                          </Button>
+                        </div>
                       </CardContent>
                     </Card>
                   );
@@ -506,7 +509,7 @@ export default function Assessments() {
           <DialogHeader>
             <DialogTitle>Detailed Assessment Results</DialogTitle>
           </DialogHeader>
-          {detailedResultsAssessment && assessmentResults[detailedResultsAssessment] && (
+          {detailedResultsAssessment && (
             <AssessmentDetailedResults
               assessmentType={detailedResultsAssessment}
               result={assessmentResults[detailedResultsAssessment]}
