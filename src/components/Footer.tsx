@@ -1,5 +1,17 @@
 import { Link } from "react-router-dom";
-import { Leaf, Heart, Shield, Mail } from "lucide-react";
+import {
+  Leaf,
+  Heart,
+  Shield,
+  Mail,
+  LayoutDashboard,
+  Bot,
+  Book,
+  Wind,
+  HeartHandshake,
+  HelpCircle,
+  FileText,
+} from "lucide-react";
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -24,22 +36,38 @@ export const Footer = () => {
             <h3 className="font-semibold text-foreground">Product</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/dashboard" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link
+                  to="/dashboard"
+                  className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
+                >
+                  <LayoutDashboard className="h-4 w-4" />
                   Dashboard
                 </Link>
               </li>
               <li>
-                <Link to="/chat" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link
+                  to="/chat"
+                  className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
+                >
+                  <Bot className="h-4 w-4" />
                   AI Chat
                 </Link>
               </li>
               <li>
-                <Link to="/journal" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link
+                  to="/journal"
+                  className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
+                >
+                  <Book className="h-4 w-4" />
                   Journal
                 </Link>
               </li>
               <li>
-                <Link to="/breathe" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link
+                  to="/breathe"
+                  className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
+                >
+                  <Wind className="h-4 w-4" />
                   Meditation
                 </Link>
               </li>
@@ -51,28 +79,47 @@ export const Footer = () => {
             <h3 className="font-semibold text-foreground">Support</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/health-support" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link
+                  to="/health-support"
+                  className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
+                >
+                  <HeartHandshake className="h-4 w-4" />
                   Health & Support
                 </Link>
               </li>
               <li>
-                <Link to="/settings/help" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link
+                  to="/settings/help"
+                  className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
+                >
+                  <HelpCircle className="h-4 w-4" />
                   Help Center
                 </Link>
               </li>
               <li>
-                <Link to="/settings/legal" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link
+                  to="/settings/legal"
+                  className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
+                >
+                  <FileText className="h-4 w-4" />
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link to="/settings/legal" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link
+                  to="/settings/legal"
+                  className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
+                >
+                  <FileText className="h-4 w-4" />
                   Terms of Service
                 </Link>
               </li>
               <li>
-                <a href="mailto:support@peace.app" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
-                  <Mail className="h-3 w-3" />
+                <a
+                  href="mailto:support@peace.app"
+                  className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
+                >
+                  <Mail className="h-4 w-4" />
                   Contact Us
                 </a>
               </li>
