@@ -21,15 +21,8 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/BottomNav";
-
-interface ChatMessage {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-  type?: 'therapeutic' | 'general' | 'crisis' | 'celebration';
-  suggestions?: string[];
-}
+import { ChatMessage } from "@/types";
+import { getDynamicSuggestions } from "@/lib/suggestions";
 
 const therapeuticPrompts = [
   "I'm feeling anxious about work",
@@ -89,13 +82,14 @@ export default function EnhancedChat() {
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
     setInput("");
     setIsTyping(true);
 
     try {
       // Simulate AI response with therapeutic capabilities
-      const response = await generateTherapeuticResponse(input.trim(), chatMode);
+      const response = await generateTherapeuticResponse(input.trim(), chatMode, newMessages);
       
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
@@ -117,7 +111,7 @@ export default function EnhancedChat() {
     }
   };
 
-  const generateTherapeuticResponse = async (userInput: string, mode: string) => {
+  const generateTherapeuticResponse = async (userInput: string, mode: string, currentMessages: ChatMessage[]) => {
     // In a real app, this would call the AI service
     // For now, we'll simulate therapeutic responses
     
@@ -151,10 +145,19 @@ export default function EnhancedChat() {
     }
 
     // General supportive responses
+    const responseContent = "Thank you for sharing that with me. It takes courage to open up about your feelings. I'm here to listen and support you.\n\nWhat would be most helpful for you right now? Would you like to explore your feelings more, try a coping strategy, or just have someone to talk to?";
+    const responseMessage: ChatMessage = {
+      id: 'temp',
+      role: 'assistant',
+      content: responseContent,
+      timestamp: new Date(),
+      type: 'therapeutic',
+    };
+
     return {
-      content: "Thank you for sharing that with me. It takes courage to open up about your feelings. I'm here to listen and support you.\n\nWhat would be most helpful for you right now? Would you like to explore your feelings more, try a coping strategy, or just have someone to talk to?",
+      content: responseContent,
       type: 'therapeutic' as const,
-      suggestions: ['I want to explore my feelings', 'Show me coping strategies', 'I just need someone to listen', 'I want to set a goal']
+      suggestions: getDynamicSuggestions([...currentMessages, responseMessage])
     };
   };
 
@@ -340,6 +343,7 @@ export default function EnhancedChat() {
                 onClick={handleSendMessage}
                 disabled={!input.trim() || isTyping}
                 size="icon"
+                aria-label="Send message"
               >
                 <Send className="h-4 w-4" />
               </Button>
