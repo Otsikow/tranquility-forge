@@ -6,6 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import AssessmentAnalytics from "@/components/AssessmentAnalytics";
+import AssessmentScheduler from "@/components/AssessmentScheduler";
+import AssessmentComparison from "@/components/AssessmentComparison";
+import AssessmentProviderShare from "@/components/AssessmentProviderShare";
+import CrisisInterventionFlow from "@/components/CrisisInterventionFlow";
+import AssessmentGoals from "@/components/AssessmentGoals";
+import { generateAssessmentPDF } from "@/lib/pdfExport";
 import {
   Brain,
   Heart,
@@ -20,6 +27,7 @@ import {
   TrendingUp,
   Calendar,
   FileText,
+  Share2,
 } from "lucide-react";
 import SelfAssessment from "@/components/SelfAssessment";
 import AssessmentDetailedResults from "@/components/AssessmentDetailedResults";
@@ -70,6 +78,10 @@ export default function Assessments() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("assessments");
   const [detailedResultsAssessment, setDetailedResultsAssessment] = useState<AssessmentType | null>(null);
+  const [showCrisisFlow, setShowCrisisFlow] = useState(false);
+  const [crisisAssessmentData, setCrisisAssessmentData] = useState<{ type: AssessmentType; score: number; severity: string } | null>(null);
+  const [showProviderShare, setShowProviderShare] = useState(false);
+  const [shareAssessmentType, setShareAssessmentType] = useState<AssessmentType | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -100,6 +112,16 @@ export default function Assessments() {
   const handleAssessmentComplete = async (assessmentId: AssessmentType, result: AssessmentResult) => {
     setAssessmentResults((prev) => ({ ...prev, [assessmentId]: result }));
     setSelectedAssessment(null);
+
+    // Check if crisis intervention is needed
+    if (result.level === 'severe' || result.level === 'moderately_severe') {
+      setCrisisAssessmentData({
+        type: assessmentId,
+        score: result.score,
+        severity: result.level
+      });
+      setShowCrisisFlow(true);
+    }
 
     try {
       const history = await getAssessmentHistoryWithInsights(assessmentId, 5);
@@ -153,6 +175,25 @@ export default function Assessments() {
     window.URL.revokeObjectURL(url);
   };
 
+  const handleExportPDF = async (assessmentType: AssessmentType) => {
+    try {
+      const history = await getAssessmentHistoryWithInsights(assessmentType, 10);
+      if (history.length === 0) {
+        alert('No assessment results to export');
+        return;
+      }
+      generateAssessmentPDF(history);
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      alert('Failed to export PDF');
+    }
+  };
+
+  const handleShareWithProvider = (assessmentType: AssessmentType) => {
+    setShareAssessmentType(assessmentType);
+    setShowProviderShare(true);
+  };
+
   return (
     <div className="min-h-screen bg-background pb-20">
       <AppBar title="Mental Health Assessments" showBack backTo="/dashboard" />
@@ -167,9 +208,12 @@ export default function Assessments() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="assessments">Assessments</TabsTrigger>
-            <TabsTrigger value="history">History</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="comparison">Compare</TabsTrigger>
+            <TabsTrigger value="goals">Goals</TabsTrigger>
+            <TabsTrigger value="schedule">Schedule</TabsTrigger>
             <TabsTrigger value="insights">Insights</TabsTrigger>
           </TabsList>
 
@@ -298,8 +342,67 @@ export default function Assessments() {
             </div>
           </TabsContent>
 
-          {/* History Tab */}
-          <TabsContent value="history" className="space-y-6">
+          {/* Analytics Tab */}
+          <TabsContent value="analytics" className="space-y-6">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold">Assessment Analytics</h2>
+              </div>
+              <div className="grid grid-cols-1 gap-4">
+                {availableAssessments.map((assessment) => (
+                  <div key={assessment.id} className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold">{assessment.name}</h3>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleExportPDF(assessment.id as AssessmentType)}
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          Export PDF
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleShareWithProvider(assessment.id as AssessmentType)}
+                        >
+                          <Share2 className="h-4 w-4 mr-2" />
+                          Share
+                        </Button>
+                      </div>
+                    </div>
+                    <AssessmentAnalytics assessmentType={assessment.id as AssessmentType} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* Comparison Tab */}
+          <TabsContent value="comparison" className="space-y-6">
+            <AssessmentComparison />
+          </TabsContent>
+
+          {/* Goals Tab */}
+          <TabsContent value="goals" className="space-y-6">
+            <AssessmentGoals 
+              currentResults={Object.fromEntries(
+                Object.entries(assessmentResults).map(([key, result]) => [
+                  key,
+                  { score: result.score, severity: result.level }
+                ])
+              ) as any}
+            />
+          </TabsContent>
+
+          {/* Schedule Tab */}
+          <TabsContent value="schedule" className="space-y-6">
+            <AssessmentScheduler />
+          </TabsContent>
+
+          {/* History Tab - Removed, moved to Analytics */}
+          <TabsContent value="history" className="space-y-6" style={{display: 'none'}}>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold">Assessment History</h2>
@@ -515,6 +618,27 @@ export default function Assessments() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Crisis Intervention Flow */}
+      {crisisAssessmentData && (
+        <CrisisInterventionFlow
+          open={showCrisisFlow}
+          onOpenChange={setShowCrisisFlow}
+          assessmentType={crisisAssessmentData.type}
+          score={crisisAssessmentData.score}
+          severity={crisisAssessmentData.severity}
+        />
+      )}
+
+      {/* Provider Share Dialog */}
+      {shareAssessmentType && (
+        <AssessmentProviderShare
+          results={assessmentHistory.filter(h => h.assessment_type === shareAssessmentType)}
+          assessmentType={shareAssessmentType}
+          open={showProviderShare}
+          onOpenChange={setShowProviderShare}
+        />
+      )}
     </div>
   );
 }

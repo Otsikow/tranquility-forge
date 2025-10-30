@@ -122,10 +122,28 @@ export default function SelfAssessment({ assessmentType, onComplete, onClose }: 
       const totalScore = Object.values(answers).reduce((sum, score) => sum + score, 0);
       
       // Check for crisis indicators (suicidal ideation in PHQ-9)
-      if (assessmentType === 'phq9' && answers.suicidal >= 1) {
-        // Show crisis warning before completing assessment
+      if (assessmentType === 'phq9' && answers.suicidal >= 2) {
+        // Show immediate crisis warning for moderate to high suicidal ideation
+        const immediateHelp = window.confirm(
+          '⚠️ CRISIS ALERT\n\n' +
+          'Your responses indicate you may be having frequent thoughts of self-harm. ' +
+          'Your safety is our top priority.\n\n' +
+          'If you are in immediate danger:\n' +
+          '• Call 988 (Suicide & Crisis Lifeline) - Press 1\n' +
+          '• Text HOME to 741741\n' +
+          '• Call 911 for emergency services\n\n' +
+          'Click OK to see crisis resources, or Cancel to stop the assessment.'
+        );
+        
+        if (!immediateHelp) {
+          setIsLoading(false);
+          return;
+        }
+      } else if (assessmentType === 'phq9' && answers.suicidal >= 1) {
+        // Show warning for occasional thoughts
         const confirmed = window.confirm(
           'Your responses indicate you may be having thoughts of self-harm. ' +
+          'These thoughts should be taken seriously. ' +
           'If you are in immediate danger, please call 988 (Suicide Prevention Lifeline) or 911. ' +
           'Do you want to continue with the assessment?'
         );
