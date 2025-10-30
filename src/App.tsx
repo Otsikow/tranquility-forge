@@ -10,7 +10,7 @@ import { ThemeProvider } from "next-themes";
 import { usePWA } from "@/hooks/usePWA";
 import { lazy, Suspense } from "react";
 
-// Eager load critical routes
+// Eagerly loaded critical routes
 import Index from "./pages/Index";
 import Welcome from "./pages/Welcome";
 import Login from "./pages/auth/Login";
@@ -19,7 +19,7 @@ import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 
-// Lazy load for optimization
+// Lazy-loaded feature pages for performance
 const Wellness = lazy(() => import("./pages/Wellness"));
 const Chat = lazy(() => import("./pages/EnhancedChat"));
 const Moods = lazy(() => import("./pages/Moods"));
@@ -116,6 +116,8 @@ const App = () => {
                 <Route path="/settings/legal" element={<Legal />} />
                 <Route path="/health-support" element={<HealthSupport />} />
                 <Route path="/admin" element={<Admin />} />
+
+                {/* Fallback */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

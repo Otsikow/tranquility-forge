@@ -15,8 +15,8 @@ const navItems = [
   { icon: Heart, label: "Wellness", path: "/wellness" },
   { icon: BookOpen, label: "Journal", path: "/journal" },
   { icon: Music, label: "Meditate", path: "/meditations" },
-  { icon: MessageCircle, label: "Chat", path: "/chat" },
   { icon: Users, label: "Community", path: "/community" },
+  { icon: MessageCircle, label: "AI Chat", path: "/chat" },
   { icon: User, label: "Profile", path: "/profile" },
 ];
 
