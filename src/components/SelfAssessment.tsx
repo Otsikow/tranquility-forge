@@ -138,6 +138,18 @@ export default function SelfAssessment({ assessmentType, onComplete, onClose }: 
       
       // Complete assessment in database
       const dbResult = await completeAssessment(assessmentType, totalScore, answers);
+
+      // Log activity for analytics/achievements
+      try {
+        await logActivity('assessment_completed', undefined, undefined, {
+          assessment_type: assessmentType,
+          score: totalScore,
+          severity: dbResult.severity,
+        });
+      } catch (e) {
+        // Non-blocking
+        console.warn('Activity log failed', e);
+      }
       
       const assessmentResult: AssessmentResult = {
         score: totalScore,
@@ -167,6 +179,13 @@ export default function SelfAssessment({ assessmentType, onComplete, onClose }: 
       };
 
       setResult(assessmentResult);
+      try {
+        await logActivity('assessment_completed_local', undefined, undefined, {
+          assessment_type: assessmentType,
+          score: totalScore,
+          severity: level,
+        });
+      } catch {}
       setIsCompleted(true);
 
       onComplete?.(assessmentResult);
