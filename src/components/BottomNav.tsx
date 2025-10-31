@@ -12,8 +12,6 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { icon: Home, label: "Home", path: "/dashboard" },
-  { icon: Heart, label: "Wellness", path: "/wellness" },
-  { icon: BookOpen, label: "Journal", path: "/journal" },
   { icon: Music, label: "Meditate", path: "/meditations" },
   { icon: Users, label: "Community", path: "/community" },
   { icon: MessageCircle, label: "AI Chat", path: "/chat" },
