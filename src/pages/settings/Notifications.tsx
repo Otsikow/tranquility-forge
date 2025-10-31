@@ -13,15 +13,42 @@ import {
   NotificationSettings,
   notify,
 } from "@/lib/notifications";
+import {
+  isPushSupported,
+  getNotificationPermission,
+  requestNotificationPermission,
+  subscribeToPush,
+  unsubscribeFromPush,
+  getPushTopics,
+  updatePushTopics,
+} from "@/lib/pushNotifications";
 import { Bell, Clock, Flame, Heart } from "lucide-react";
 
 export default function Notifications() {
   const [settings, setSettings] = useState<NotificationSettings>(getNotificationSettings());
   const { toast } = useToast();
+  const [pushSupported, setPushSupported] = useState(false);
+  const [permission, setPermission] = useState<NotificationPermission>("default");
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [topics, setTopics] = useState<string[]>([]);
 
   useEffect(() => {
-    // Load settings on mount
+    // Load settings and push state on mount
     setSettings(getNotificationSettings());
+    setPushSupported(isPushSupported());
+    setPermission(getNotificationPermission());
+
+    // Check topics/subscription silently
+    (async () => {
+      try {
+        const t = await getPushTopics();
+        setTopics(t);
+        // If topics exist, we consider subscribed
+        setIsSubscribed(t.length > 0);
+      } catch {
+        // ignore
+      }
+    })();
   }, []);
 
   const handleToggle = (key: keyof NotificationSettings) => {
@@ -46,6 +73,50 @@ export default function Notifications() {
       title: "Test Notification",
       description: "This is how notifications will appear in the app.",
     });
+  };
+
+  const handleEnablePush = async () => {
+    try {
+      const perm = await requestNotificationPermission();
+      setPermission(perm);
+      if (perm !== "granted") {
+        toast({ title: "Permission denied", description: "Enable notifications in your browser settings.", variant: "destructive" });
+        return;
+      }
+      const sub = await subscribeToPush();
+      if (sub) {
+        setIsSubscribed(true);
+        toast({ title: "Push enabled", description: "You will receive push notifications when supported." });
+      }
+    } catch (e) {
+      toast({ title: "Push setup failed", description: "Please try again later.", variant: "destructive" });
+    }
+  };
+
+  const handleDisablePush = async () => {
+    try {
+      await unsubscribeFromPush();
+      setIsSubscribed(false);
+      setTopics([]);
+      toast({ title: "Push disabled", description: "You will no longer receive push notifications." });
+    } catch (e) {
+      toast({ title: "Failed to disable", description: "Please try again.", variant: "destructive" });
+    }
+  };
+
+  const toggleTopic = async (topic: string) => {
+    const newTopics = topics.includes(topic)
+      ? topics.filter((t) => t !== topic)
+      : [...topics, topic];
+    setTopics(newTopics);
+    try {
+      await updatePushTopics(newTopics);
+      toast({ title: "Preferences saved", description: "Your push topics were updated." });
+    } catch {
+      // revert on error
+      setTopics(topics);
+      toast({ title: "Save failed", description: "Could not update topics.", variant: "destructive" });
+    }
   };
 
   return (
@@ -181,24 +252,69 @@ export default function Notifications() {
           </CardContent>
         </Card>
 
-        {/* Future Push Notifications */}
-        <Card className="border-dashed">
+        {/* Push Notifications */}
+        <Card>
           <CardHeader>
-            <CardTitle className="text-muted-foreground">Push Notifications</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Bell className="h-5 w-5" />
+              Push Notifications
+            </CardTitle>
             <CardDescription>
-              Coming soon: Receive notifications even when the app is closed
+              Receive notifications even when the app is closed
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <Button disabled className="w-full">
-              Enable Push Notifications (Coming Soon)
-            </Button>
+          <CardContent className="space-y-4">
+            {!pushSupported && (
+              <p className="text-sm text-muted-foreground">
+                Push not supported in this environment. Install as a PWA and try Chrome/Edge.
+              </p>
+            )}
+
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <Label>Browser Permission</Label>
+                <p className="text-sm text-muted-foreground capitalize">{permission}</p>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={handleEnablePush} disabled={!pushSupported || permission === "granted"}>
+                  Enable
+                </Button>
+                <Button variant="outline" onClick={handleDisablePush} disabled={!pushSupported || !isSubscribed}>
+                  Disable
+                </Button>
+              </div>
+            </div>
+
+            <div className="space-y-2 pt-2 border-t">
+              <Label>Topics</Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {[
+                  { key: "daily", label: "Daily Check-ins" },
+                  { key: "meditation", label: "Meditation Reminders" },
+                  { key: "streaks", label: "Streak Milestones" },
+                  { key: "announcements", label: "Announcements" },
+                ].map((t) => (
+                  <button
+                    key={t.key}
+                    type="button"
+                    onClick={() => toggleTopic(t.key)}
+                    className={`text-left px-3 py-2 border rounded-md ${topics.includes(t.key) ? 'bg-primary/10 border-primary' : 'hover:bg-muted'}`}
+                    disabled={!isSubscribed}
+                  >
+                    <span className="text-sm font-medium">{t.label}</span>
+                    <span className="block text-xs text-muted-foreground">{topics.includes(t.key) ? 'Enabled' : 'Disabled'}</span>
+                  </button>
+                ))}
+              </div>
+              {!isSubscribed && (
+                <p className="text-xs text-muted-foreground">Subscribe first to manage topics.</p>
+              )}
+            </div>
           </CardContent>
         </Card>
 
         <div className="text-center text-sm text-muted-foreground pt-4">
-          <p>All notifications are currently in-app only.</p>
-          <p>Push notification support will be added in a future update.</p>
+          <p>In-app notifications are always available. Push requires permission and PWA install.</p>
         </div>
       </div>
 
