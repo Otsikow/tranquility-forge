@@ -44,6 +44,7 @@ const features = [{
 }];
 
 const quickLinks = [
+  { icon: Heart, label: "Wellness", to: "/wellness" },
   { icon: BookOpen, label: "Journal", to: "/journal" },
   { icon: Music, label: "Meditations", to: "/meditations" },
   { icon: MessageCircle, label: "Chat", to: "/chat" },
