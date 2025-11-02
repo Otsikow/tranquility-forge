@@ -22,7 +22,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/BottomNav";
 import { ChatMessage } from "@/types";
-import { getDynamicSuggestions } from "@/lib/suggestions";
+import { getAiSuggestions } from "@/lib/aiSuggestions";
 
 const therapeuticPrompts = [
   "I'm feeling anxious about work",
@@ -100,10 +100,8 @@ export default function EnhancedChat() {
         suggestions: response.suggestions
       };
 
-      setTimeout(() => {
-        setMessages(prev => [...prev, assistantMessage]);
-        setIsTyping(false);
-      }, 1000 + Math.random() * 2000); // Simulate thinking time
+      setMessages(prev => [...prev, assistantMessage]);
+      setIsTyping(false);
 
     } catch (error) {
       console.error('Error generating response:', error);
@@ -157,7 +155,7 @@ export default function EnhancedChat() {
     return {
       content: responseContent,
       type: 'therapeutic' as const,
-      suggestions: getDynamicSuggestions([...currentMessages, responseMessage])
+      suggestions: await getAiSuggestions([...currentMessages, responseMessage])
     };
   };
 

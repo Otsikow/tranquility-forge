@@ -1,12 +1,18 @@
-export const getOpenAIConfig = () => {
-  const url = import.meta.env.VITE_SUPABASE_URL;
-  
-  if (!url) {
-    throw new Error('VITE_SUPABASE_URL is not configured');
-  }
 
-  return {
-    baseURL: `${url}/functions/v1/chat-stream`,
-    model: 'gpt-4o-mini',
-  };
-};
+import { z } from "zod";
+
+const envSchema = z.object({
+  googleAiApiKey: z.string().min(1, { message: "Google AI API key is required" }),
+});
+
+const envValidated = envSchema.safeParse({
+  googleAiApiKey: import.meta.env.VITE_GOOGLE_AI_API_KEY,
+});
+
+if (!envValidated.success) {
+  throw new Error(
+    `Invalid environment variables: ${envValidated.error.flatten().fieldErrors}`
+  );
+}
+
+export const env = envValidated.data;
