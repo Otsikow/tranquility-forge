@@ -27,6 +27,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import logoImage from "@/assets/logo.png";
 import hummingbirdImage from "@/assets/hummingbird.png";
+import AIEstimator from "@/components/AIEstimator";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -178,6 +179,9 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* AI Estimator */}
+            <AIEstimator />
 
             {/* Quick Links */}
             <div className="space-y-6">
